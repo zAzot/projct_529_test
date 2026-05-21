@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Системное управление - Админ панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --page-background: rgba(217, 217, 191, 0.40);
+            --text-color-base: #222;
+            --text-gray: #555;
+            --panel-background: #fff;
+            --panel-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --content-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-color-gray: #e0e0e0;
+            --border-color-gray-dark: #ccc;
+            --btn-orange-background: #ffa726;
+            --btn-black-background: #222;
+            --btn-black-background-hover: #000;
+            --btn-black-color: #fff;
+            --btn-graphite-background: #90a4ae;
+            --btn-graphite-background-hover: #9badb6;
+            --btn-danger-background: #e57373;
+            --btn-danger-background-hover: #e68a8a;
+            --btn-success-background: #7cb342;
+            --btn-success-background-hover: #8bc34a;
+            --btn-info-background: #17a2b8;
+            --btn-info-background-hover: #138496;
+            --input-background: #fff;
+            --input-border: 1px solid #d2d2d2;
+            --input-border-radius: 4px;
+            --hover-item-background: #f0f0e8;
+            --content-border-radius: 8px;
+            --table-header-background: #f5f5ef;
+        }
+
+        body {
+            background-color: var(--page-background);
+            color: var(--text-color-base);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.4;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .header h1 {
+                font-size: 22px;
+                font-weight: 600;
+                color: var(--text-color-base);
+            }
+
+        .btn {
+            align-items: center;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            height: 38px;
+            justify-content: center;
+            padding: 0 16px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn--small {
+            min-width: auto;
+            height: 32px;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .btn--black {
+            background: var(--btn-black-background);
+            color: var(--btn-black-color);
+        }
+
+            .btn--black:hover {
+                background: var(--btn-black-background-hover);
+            }
+
+        .btn--danger {
+            background: var(--btn-danger-background);
+            color: #fff;
+        }
+
+            .btn--danger:hover {
+                background: var(--btn-danger-background-hover);
+            }
+
+        .btn--success {
+            background: var(--btn-success-background);
+            color: #fff;
+        }
+
+            .btn--success:hover {
+                background: var(--btn-success-background-hover);
+            }
+
+        .btn--cancel {
+            background: var(--btn-graphite-background);
+            color: #fff;
+        }
+
+            .btn--cancel:hover {
+                background: var(--btn-graphite-background-hover);
+            }
+
+        .btn--info {
+            background: var(--btn-info-background);
+            color: #fff;
+        }
+
+            .btn--info:hover {
+                background: var(--btn-info-background-hover);
+            }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-gray);
+            }
+
+            .form-group input, .form-group select {
+                width: 100%;
+                padding: 10px 12px;
+                background-color: var(--input-background);
+                border: var(--input-border);
+                border-radius: var(--input-border-radius);
+                font-size: 15px;
+                transition: all 0.2s ease;
+            }
+
+                .form-group input:focus, .form-group select:focus {
+                    border-color: var(--btn-black-background);
+                    outline: none;
+                }
+
+        .nav-tabs {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 10px 12px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 8px;
+            border: 1px solid var(--border-color-gray);
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+            .nav-tab:hover {
+                background: var(--hover-item-background);
+            }
+
+            .nav-tab.active {
+                background: var(--btn-black-background);
+                color: #fff;
+            }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        .action-card {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 24px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .action-card h3 {
+                font-size: 18px;
+                margin-bottom: 12px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid var(--border-color-gray);
+            }
+
+            .action-card p {
+                color: var(--text-gray);
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+
+        .table-container {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color-gray);
+        }
+
+        .table-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+            .table-header-actions h3 {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color-gray);
+        }
+
+        th {
+            background: var(--table-header-background);
+            font-weight: 600;
+            color: var(--text-color-base);
+        }
+
+        tr:hover {
+            background: var(--hover-item-background);
+        }
+
+        .log-data-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .alert {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 4px;
+            color: #fff;
+            z-index: 4000;
+            animation: slideIn 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-success {
+            background: var(--btn-success-background);
+        }
+
+        .alert-error {
+            background: var(--btn-danger-background);
+        }
+
+        .alert-info {
+            background: var(--btn-info-background);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+            .modal.active {
+                display: flex;
+                animation: fadeIn 0.2s;
+            }
+
+        .modal-content {
+            background: var(--panel-background);
+            padding: 25px;
+            border-radius: var(--content-border-radius);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: var(--content-box-shadow);
+        }
+
+            .modal-content h3 {
+                margin-bottom: 15px;
+                text-align: left;
+            }
+
+            .modal-content p {
+                color: var(--text-gray);
+                margin-bottom: 20px;
+            }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainWrapper" style="display: none;">
+        <div class="header">
+            <h1>Системное управление сервером</h1>
+            <div>
+                <button class="btn btn--graphite" onclick="localStorage.removeItem('adminToken'); window.location.href = '/login';">Выйти</button>
+            </div>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="backupTab">Резервные копии (БД)</button>
+            <button class="nav-tab" data-tab="adminsTab">Управление доступом</button>
+            <button class="nav-tab" data-tab="logsTab">Логи</button>
+            <button class="nav-tab" data-tab="contactsTab">Контакты продавца</button>
+        </div>
+
+        <div id="backupTab" class="tab-content active">
+            <div class="cards-grid">
+                <div class="action-card">
+                    <h3>Создание ручной копии</h3>
+                    <p>Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.</p>
+                    <button class="btn btn--success full-width" onclick="createManualBackup()">Создать бэкап</button>
+                </div>
+                <div class="action-card">
+                    <h3>Восстановление (Ручная копия)</h3>
+                    <p>Восстановить данные из таблицы manual_backup.</p>
+                    <div class="form-group">
+                        <label>Таблицы для восстановления</label>
+                        <select id="restoreManualTables">
+                            <option value="all">Все (pub, unpub, buffer)</option>
+                            <option value="tbl_1_pub">Только tbl_1_pub</option>
+                            <option value="tbl_2_unpub">Только tbl_2_unpub</option>
+                            <option value="tbl_3_buffer">Только tbl_3_buffer</option>
+                        </select>
+                    </div>
+                    <button class="btn btn--black full-width" onclick="restoreManualBackup()">Восстановить данные</button>
+                </div>
+                <div class="action-card">
+                    <h3>Восстановление (Авто-копия)</h3>
+                    <p>Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.</p>
+                    <div class="form-group">
+                        <label>Таблицы для восстановления</label>
+                        <select id="restoreAutoTables">
+                            <option value="all">Все (pub, unpub, buffer)</option>
+                            <option value="tbl_1_pub">Только tbl_1_pub</option>
+                            <option value="tbl_2_unpub">Только tbl_2_unpub</option>
+                            <option value="tbl_3_buffer">Только tbl_3_buffer</option>
+                        </select>
+                    </div>
+                    <button class="btn btn--black full-width" onclick="restoreAutoBackup()">Восстановить данные</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="adminsTab" class="tab-content">
+            <div class="table-container">
+                <div class="table-header-actions">
+                    <h3>Список администраторов</h3>
+                    <button class="btn btn--black btn--small" onclick="showAddAdminModal()">+ Добавить нового администратора</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>Логин</th><th>Почта</th><th>Пароль</th><th>Действие</th></tr>
+                        </thead>
+                        <tbody id="adminsTableBody">
+                            <tr><td colspan="4" class="text-center">Загрузка</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="logsTab" class="tab-content">
+            <div class="table-container">
+                <div class="table-header-actions">
+                    <h3>Логи администраторов</h3>
+                    <button class="btn btn--black btn--small" onclick="loadLogs()">Обновить</button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Логин</th><th>Эндпоинт</th><th>Request Data</th><th>Response Data</th><th>Время создания</th></tr>
+                        </thead>
+                        <tbody id="logsTableBody">
+                            <tr><td colspan="6" class="text-center">Загрузка</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="contactsTab" class="tab-content">
+            <div class="cards-grid">
+                <div class="action-card">
+                    <h3>Управление контактами продавца</h3>
+                    <p>Эти контактные данные будут отображаться для пользователей на сайте.</p>
+                    <div class="form-group">
+                        <label>Номер телефона</label>
+                        <input type="text" id="contactPhone" placeholder="Например: +380991234567">
+                    </div>
+                    <div class="form-group">
+                        <label>Имя продавца</label>
+                        <input type="text" id="contactName" placeholder="Например: Александр">
+                    </div>
+                    <button class="btn btn--success full-width" onclick="confirmUpdateContacts()">Сохранить контакты</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="text-align: center;">Подтверждение</h3>
+            <p id="modalMessage">Вы уверены?</p>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" onclick="document.getElementById('confirmModal').classList.remove('active'); confirmActionCallback = null;">Отмена</button>
+                <button class="btn btn--danger" id="modalConfirmBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+    <div id="addAdminModal" class="modal">
+        <div class="modal-content">
+            <h3 style="text-align: center;">Добавить нового администратора</h3>
+            <div class="form-group">
+                <label>Логин (Username)</label>
+                <input type="text" id="regUsername" placeholder="Только буквы и цифры">
+            </div>
+            <div class="form-group">
+                <label>Email (необязательно)</label>
+                <input type="email" id="regEmail" placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" id="generatePwdBtn" class="btn btn--info" style="display: none; padding: 0 12px; font-size: 13px;" title="Сгенерировать случайный пароль">Сгенерировать</button>
+                    <input type="password" id="regPassword" placeholder="Минимум 6 символов" style="flex: 1;">
+                </div>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" onclick="document.getElementById('addAdminModal').classList.remove('active');">Отмена</button>
+                <button class="btn btn--success" onclick="registerAdmin()">Добавить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+
+        const token = localStorage.getItem('adminToken');
+        if (!token) { window.location.href = '/login'; }
+
+        (async function initialize() {
+            try {
+                const resp = await fetch(API_BASE + '/admin/verify-super', { headers: { 'Authorization': 'Bearer ' + token } });
+                if (!resp.ok) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
+                const data = await resp.json();
+                if (!data.valid) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
+
+                document.getElementById('mainWrapper').style.display = 'block';
+                loadAdmins();
+                loadLogs();
+                loadContacts();
+            } catch (e) { localStorage.removeItem('adminToken'); window.location.href = '/login'; }
+        })();
+
+        async function loadContacts() {
+            try {
+                const res = await fetch(API_BASE + '/contacts');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('contactPhone').value = data.phone || '';
+                    document.getElementById('contactName').value = data.name || '';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки контактов:', error);
+            }
+        }
+
+        function confirmUpdateContacts() {
+            const phone = document.getElementById('contactPhone').value.trim();
+            const name = document.getElementById('contactName').value.trim();
+
+            showModal('Обновление контактов', 'Вы уверены, что хотите сохранить новые контактные данные?', async () => {
+                const payload = { phone: phone, name: name };
+
+                try {
+                    const res = await fetch(API_BASE + '/admin/contacts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    handleResponse(res, data, 'Контактные данные успешно обновлены');
+                } catch (e) {
+                    showAlert('Ошибка выполнения запроса', 'error');
+                }
+            });
+        }
+
+        async function loadAdmins() {
+            const tbody = document.getElementById('adminsTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/admin/admins-list`, {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.admins || data.admins.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
+                    } else {
+                        let html = '';
+                        data.admins.forEach(admin => {
+                            html += `<tr><td>${admin.username}</td><td>${admin.email}</td><td>******</td><td><button class="btn btn--danger btn--small" onclick="confirmDeleteAdmin('${admin.email}')">Удалить</button></td></tr>`;
+                        });
+                        tbody.innerHTML = html;
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
+                    showAlert('Не удалось загрузить список', 'error');
+                }
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
+                showAlert('Ошибка загрузки данных базы', 'error');
+            }
+        }
+
+        async function loadLogs() {
+            const tbody = document.getElementById('logsTableBody');
+            try {
+                const res = await fetch(`${API_BASE}/admin/logs`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (!data.logs || data.logs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
+                    } else {
+                        let html = '';
+                        data.logs.forEach(log => {
+                            const reqData = log.request_data ? log.request_data.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+                            const resData = log.response_data ? log.response_data.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+                            const createdTime = log.created_at ? new Date(log.created_at).toLocaleString() : '';
+                            html += `<tr><td>${log.id}</td><td>${log.login || ''}</td><td>${log.endpoint || ''}</td><td class="log-data-cell" title="${reqData}">${reqData}</td><td class="log-data-cell" title="${resData}">${resData}</td><td>${createdTime}</td></tr>`;
+                        });
+                        tbody.innerHTML = html;
+                    }
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
+                    showAlert('Не удалось загрузить логи', 'error');
+                }
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
+                showAlert('Ошибка загрузки логов', 'error');
+            }
+        }
+
+        function showAddAdminModal() {
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regPassword').type = 'password';
+            toggleGenerateButton();
+            document.getElementById('addAdminModal').classList.add('active');
+        }
+
+        const regUsername = document.getElementById('regUsername');
+        const regPassword = document.getElementById('regPassword');
+        const generatePwdBtn = document.getElementById('generatePwdBtn');
+
+        function toggleGenerateButton() {
+            if (regUsername.value.trim().length > 0 && regPassword.value.length === 0) {
+                generatePwdBtn.style.display = 'inline-flex';
+            } else {
+                generatePwdBtn.style.display = 'none';
+            }
+        }
+
+        regUsername.addEventListener('input', toggleGenerateButton);
+        regPassword.addEventListener('input', toggleGenerateButton);
+        generatePwdBtn.addEventListener('click', () => {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$%&?!`~_-<>";
+            const passwordLength = 12;
+            let generatedPassword = "";
+            for (let i = 0; i < passwordLength; i++) {
+                const randomIndex = Math.floor(Math.random() * chars.length);
+                generatedPassword += chars[randomIndex];
+            }
+            regPassword.value = generatedPassword;
+            regPassword.type = 'text';
+            toggleGenerateButton();
+            showAlert('Пароль сгенерирован! Сохраните его в надежном месте', 'info');
+        });
+
+        async function registerAdmin() {
+            const username = regUsername.value.trim();
+            const password = regPassword.value;
+            let email = regEmail.value.trim();
+
+            if (!username || !password) {
+                return showAlert('Заполните обязательные поля (Логин и Пароль)', 'error');
+            }
+            if (!email) {
+                email = `${username}@system.local`;
+            }
+
+            const payload = {
+                username: username,
+                email: email,
+                password: password
+            };
+
+            try {
+                const res = await fetch(API_BASE + '/admin/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showAlert('Администратор успешно создан', 'success');
+                    document.getElementById('addAdminModal').classList.remove('active');
+                    loadAdmins();
+                } else {
+                    showAlert(data.detail || 'Ошибка регистрации', 'error');
+                }
+            } catch (e) {
+                showAlert('Ошибка подключения', 'error');
+            }
+        }
+
+        function createManualBackup() {
+            showModal('Создание ручной копии', 'Вы уверены, что хотите перезаписать текущий ручной бэкап новыми данными?', async () => {
+                try {
+                    const res = await fetch(API_BASE + '/admin/backup/create', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    const data = await res.json();
+                    handleResponse(res, data, 'Ручная копия успешно создана');
+                } catch (e) {
+                    showAlert('Ошибка выполнения запроса', 'error');
+                }
+            });
+        }
+
+        async function restoreManualBackup() {
+            const targetTables = document.getElementById('restoreManualTables').value;
+            showModal('Восстановление из ручной копии', 'Вы уверены, что хотите перезаписать текущие данные данными из ручного бэкапа?', async () => {
+                const formData = new FormData();
+                formData.append('target_tables', targetTables);
+
+                try {
+                    const res = await fetch(API_BASE + '/admin/backup/restore', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: formData
+                    });
+                    const data = await res.json();
+                    handleResponse(res, data, 'Восстановление из ручной копии завершено');
+                } catch (e) {
+                    showAlert('Ошибка выполнения запроса', 'error');
+                }
+            });
+        }
+
+        async function restoreAutoBackup() {
+            const targetTables = document.getElementById('restoreAutoTables').value;
+            showModal('Восстановление из авто-копии', 'Эта копия была создана перед последней загрузкой файла. Перезаписать текущие данные?', async () => {
+                const formData = new FormData();
+                formData.append('target_tables', targetTables);
+
+                try {
+                    const res = await fetch(API_BASE + '/admin/backup/restore-auto', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: formData
+                    });
+                    const data = await res.json();
+                    handleResponse(res, data, 'Восстановление из авто-копии завершено');
+                } catch (e) {
+                    showAlert('Ошибка выполнения запроса', 'error');
+                }
+            });
+        }
+
+        function confirmDeleteAdmin(targetEmail) {
+            showModal('Удаление администратора', `Вы уверены, что хотите удалить администратора ${targetEmail}?`, async () => {
+                const formData = new FormData();
+                formData.append('email', targetEmail);
+
+                try {
+                    const res = await fetch(API_BASE + '/admin/delete', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token },
+                        body: formData
+                    });
+
+                    if (res.ok) {
+                        showAlert('Администратор удален', 'success');
+                        loadAdmins();
+                    } else {
+                        const data = await res.json();
+                        handleResponse(res, data, '');
+                    }
+                } catch (e) {
+                    showAlert('Ошибка выполнения запроса', 'error');
+                }
+            });
+        }
+
+        function handleResponse(res, data, successMsg) {
+            if (res.ok) {
+                showAlert(successMsg || data.message || 'Успешно', 'success');
+            } else {
+                showAlert(data.detail || 'Ошибка выполнения действия', 'error');
+            }
+        }
+
+        function showAlert(msg, type) {
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-' + type;
+            alert.textContent = msg;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 4000);
+        }
+
+        let confirmActionCallback = null;
+        const modal = document.getElementById('confirmModal');
+
+        function showModal(title, message, callback) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalMessage').textContent = message;
+            confirmActionCallback = callback;
+            modal.classList.add('active');
+        }
+
+        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+            if (confirmActionCallback) confirmActionCallback();
+            document.getElementById('confirmModal').classList.remove('active');
+            confirmActionCallback = null;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вхід в адмін панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --page-background: rgba(217, 217, 191, 0.40);
+            --text-color-base: #222;
+            --panel-background: #fff;
+            --content-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-color-gray: #e0e0e0;
+            --btn-black-background: #222;
+            --btn-black-background-hover: #000;
+            --btn-black-color: #fff;
+            --input-background: #fff;
+            --input-border: 1px solid #d2d2d2;
+            --input-border-radius: 4px;
+        }
+
+        body {
+            background-color: var(--page-background);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 420px;
+            margin: 10vh auto;
+            background: var(--panel-background);
+            border-radius: 8px;
+            box-shadow: var(--content-box-shadow);
+            padding: 40px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .login-container h2 {
+                font-size: 24px;
+                margin-bottom: 24px;
+                text-align: center;
+                font-weight: 600;
+                color: var(--text-color-base);
+            }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                color: #555;
+            }
+
+            .form-group input {
+                width: 100%;
+                padding: 10px 12px;
+                background-color: var(--input-background);
+                border: var(--input-border);
+                border-radius: var(--input-border-radius);
+                font-size: 15px;
+                transition: all 0.2s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: var(--btn-black-background);
+                    outline: none;
+                }
+
+        .btn {
+            align-items: center;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            height: 38px;
+            justify-content: center;
+            line-height: 1;
+            min-width: 110px;
+            padding: 0 16px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn--black {
+            background: var(--btn-black-background);
+            color: var(--btn-black-color);
+        }
+
+            .btn--black:hover {
+                background: var(--btn-black-background-hover);
+            }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .alert {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 4px;
+            color: #fff;
+            z-index: 4000;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-success {
+            background: #7cb342;
+        }
+
+        .alert-error {
+            background: #e57373;
+        }
+
+        .alert-info {
+            background: #17a2b8;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .language-switcher {
+            display: flex;
+            gap: 8px;
+            background: #f5f5f0;
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid var(--border-color-gray);
+            width: fit-content;
+            margin: 0 auto 20px auto;
+        }
+
+        .lang-option {
+            padding: 8px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 32px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-color-base);
+            transition: all 0.2s ease;
+        }
+
+            .lang-option.active {
+                background: var(--btn-black-background);
+                color: white;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .lang-option:hover:not(.active) {
+                background: #e9e9e2;
+            }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .hint-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 16px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="login-container">
+            <div class="language-switcher">
+                <button class="lang-option active" data-lang="ru">RU</button>
+                <button class="lang-option" data-lang="en">EN</button>
+            </div>
+            <h2 data-i18n="loginTitle">Вхід в адмін панель</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label data-i18n="loginUsername">Email або Username</label>
+                    <input type="text" id="username" autocomplete="username">
+                    <div class="hint-text" data-i18n="superHint">Залиште порожнім для входу супер-адміністратора</div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="loginPassword">Пароль / Код доступу</label>
+                    <input type="password" id="password" autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn--black full-width" data-i18n="loginBtn">Увійти</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const translations = {
+            ru: {
+                loginTitle: 'Вход в админ панель',
+                loginUsername: 'Email или Username',
+                loginPassword: 'Пароль / Код доступа',
+                loginBtn: 'Войти',
+                superHint: 'Оставьте пустым для входа супер-администратора',
+                errorAuth: 'Ошибка авторизации',
+                errorConnection: 'Ошибка подключения к серверу'
+            },
+            en: {
+                loginTitle: 'Admin Login',
+                loginUsername: 'Email or Username',
+                loginPassword: 'Password / Access Code',
+                loginBtn: 'Login',
+                superHint: 'Leave empty for super-admin access',
+                errorAuth: 'Authentication failed',
+                errorConnection: 'Connection error'
+            }
+        };
+        let currentLang = localStorage.getItem('appLang') || 'ru';
+        function t(key) {
+            return translations[currentLang] && translations[currentLang][key] !== undefined ? translations[currentLang][key] : key;
+        }
+        function updateStaticTexts() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (key && translations[currentLang][key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[currentLang][key];
+                    else el.textContent = translations[currentLang][key];
+                }
+            });
+            document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+        }
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+            updateStaticTexts();
+        }
+        function showAlert(msg, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.textContent = msg;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+        document.querySelectorAll('.lang-option').forEach(btn => {
+            btn.onclick = () => setLanguage(btn.dataset.lang);
+        });
+        updateStaticTexts();
+        const API_BASE = window.location.origin;
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginValue = username.trim() === '' ? 'none' : username.trim();
+            const formData = new FormData();
+            formData.append('username', loginValue);
+            formData.append('password', password);
+            try {
+                const resp = await fetch(API_BASE + '/token', { method: 'POST', body: formData });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (data.access_token) {
+                        localStorage.setItem('adminToken', data.access_token);
+                        window.location.href = data.redirect_url;
+                    } else {
+                        showAlert(t('errorAuth'), 'error');
+                    }
+                } else {
+                    const errData = await resp.json();
+                    showAlert(errData.detail || t('errorAuth'), 'error');
+                }
+            } catch (e) {
+                showAlert(t('errorConnection'), 'error');
+            }
+        });
+    </script>
+</body>
+</html>

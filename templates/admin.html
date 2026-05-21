@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Админ панель - Управление данными</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --page-background: rgba(217, 217, 191, 0.40);
+            --text-color-base: #222;
+            --text-gray: #555;
+            --panel-background: #fff;
+            --panel-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --content-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --border-color-gray: #e0e0e0;
+            --border-color-gray-dark: #ccc;
+            --btn-orange-background: #ffa726;
+            --btn-orange-background-hover: #ffb03b;
+            --btn-orange-color: #fff;
+            --btn-black-background: #222;
+            --btn-black-background-hover: #000;
+            --btn-black-color: #fff;
+            --btn-graphite-background: #90a4ae;
+            --btn-graphite-background-hover: #9badb6;
+            --btn-danger-background: #e57373;
+            --btn-danger-background-hover: #e68a8a;
+            --btn-success-background: #7cb342;
+            --btn-success-background-hover: #8bc34a;
+            --btn-info-background: #17a2b8;
+            --btn-info-background-hover: #138496;
+            --input-background: #fff;
+            --input-border: 1px solid #d2d2d2;
+            --input-border-radius: 4px;
+            --table-header-background: #f5f5ef;
+            --hover-item-background: #f0f0e8;
+            --icon-background-black: rgba(34, 34, 34, 0.05);
+            --content-border-radius: 8px;
+            --sidebar-width: 280px;
+            --dropdown-border-color: #e57373;
+            --dropdown-btn-hover-bg: #222;
+            --dropdown-btn-hover-color: #fff;
+            --dropdown-btn-active-bg: #222;
+            --dropdown-btn-active-color: #fff;
+        }
+
+        body {
+            background-color: var(--page-background);
+            color: var(--text-color-base);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 16px;
+            line-height: 1.4;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+            .tab-content.active {
+                display: block;
+            }
+
+        .header {
+            background-color: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .header h1 {
+                font-size: 22px;
+                font-weight: 600;
+                color: var(--text-color-base);
+            }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+            .user-info span {
+                color: var(--text-gray);
+                font-size: 16px;
+            }
+
+        .language-switcher {
+            display: flex;
+            gap: 8px;
+            background: #f5f5f0;
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid var(--border-color-gray);
+            flex-shrink: 0;
+        }
+
+        .lang-option {
+            padding: 8px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 32px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-color-base);
+            transition: all 0.2s ease;
+        }
+
+            .lang-option.active {
+                background: var(--btn-black-background);
+                color: white;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+
+            .lang-option:hover:not(.active) {
+                background: #e9e9e2;
+            }
+
+        .btn {
+            align-items: center;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: inline-flex;
+            height: 38px;
+            justify-content: center;
+            line-height: 1;
+            min-width: 110px;
+            padding: 0 16px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+
+            .btn:active {
+                transform: translateY(0);
+            }
+
+        .btn--black {
+            background: var(--btn-black-background);
+            color: var(--btn-black-color);
+        }
+
+            .btn--black:hover {
+                background: var(--btn-black-background-hover);
+            }
+
+        .btn--graphite {
+            background: var(--btn-graphite-background);
+            color: #fff;
+        }
+
+            .btn--graphite:hover {
+                background: var(--btn-graphite-background-hover);
+            }
+
+        .btn--danger {
+            background: var(--btn-danger-background);
+            color: #fff;
+        }
+
+            .btn--danger:hover {
+                background: var(--btn-danger-background-hover);
+            }
+
+        .btn--success {
+            background: var(--btn-success-background);
+            color: #fff;
+        }
+
+            .btn--success:hover {
+                background: var(--btn-success-background-hover);
+            }
+
+        .btn--info {
+            background: var(--btn-info-background);
+            color: #fff;
+        }
+
+            .btn--info:hover {
+                background: var(--btn-info-background-hover);
+            }
+
+        .btn--transparent {
+            background: transparent;
+            color: var(--text-color-base);
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .btn--transparent:hover {
+                background: var(--hover-item-background);
+            }
+
+        .btn--confirm {
+            background: var(--btn-danger-background);
+            color: #fff;
+        }
+
+            .btn--confirm:hover {
+                background: var(--btn-danger-background-hover);
+            }
+
+        .btn--cancel {
+            background: var(--btn-graphite-background);
+            color: #fff;
+        }
+
+            .btn--cancel:hover {
+                background: var(--btn-graphite-background-hover);
+            }
+
+        .btn--small {
+            min-width: auto;
+            height: 32px;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 24px;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+        }
+
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .filters-card {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 20px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .filters-card h3 {
+                font-size: 18px;
+                margin-bottom: 18px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid var(--border-color-gray);
+                font-weight: 600;
+            }
+
+        .filter-group {
+            margin-bottom: 16px;
+        }
+
+            .filter-group label {
+                display: block;
+                font-size: 14px;
+                color: var(--text-gray);
+                margin-bottom: 6px;
+                font-weight: 500;
+            }
+
+            .filter-group input, .filter-group select, .form-group input {
+                width: 100%;
+                padding: 10px 12px;
+                background-color: var(--input-background);
+                border: var(--input-border);
+                border-radius: var(--input-border-radius);
+                color: var(--text-color-base);
+                font-size: 15px;
+                transition: all 0.2s ease;
+            }
+
+                .filter-group input:focus, .filter-group select:focus, .form-group input:focus {
+                    border-color: var(--btn-black-background);
+                    outline: none;
+                }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .nav-tabs {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 10px 12px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+        .nav-tab {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-color-base);
+            transition: all 0.2s;
+        }
+
+            .nav-tab:hover {
+                background: var(--hover-item-background);
+            }
+
+            .nav-tab.active {
+                background: var(--btn-black-background);
+                color: #fff;
+            }
+
+        .table-container {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 20px;
+            overflow-x: auto;
+            border: 1px solid var(--border-color-gray);
+        }
+
+        .table-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+            .table-header-actions h3 {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color-gray);
+        }
+
+        th {
+            background: var(--table-header-background);
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            font-size: 13px;
+            color: var(--text-color-base);
+            white-space: nowrap;
+        }
+
+            th:hover {
+                background: var(--hover-item-background);
+            }
+
+            th.sorted-asc::after {
+                content: ' \2191';
+                position: absolute;
+                right: 8px;
+            }
+
+            th.sorted-desc::after {
+                content: ' \2193';
+                position: absolute;
+                right: 8px;
+            }
+
+        tr:hover {
+            background: var(--hover-item-background);
+        }
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-btn {
+            background: transparent;
+            color: var(--text-gray);
+            border: 1px solid var(--border-color-gray);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px 18px;
+            min-width: 52px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+            .dropdown-btn:hover {
+                background: var(--dropdown-btn-hover-bg);
+                color: var(--dropdown-btn-hover-color);
+                border-color: var(--dropdown-btn-hover-bg);
+            }
+
+        .dropdown.active .dropdown-btn {
+            background: var(--dropdown-btn-active-bg);
+            color: var(--dropdown-btn-active-color);
+            border-color: var(--dropdown-btn-active-bg);
+        }
+
+        .dropdown-menu {
+            position: fixed;
+            background: var(--panel-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            min-width: 190px;
+            z-index: 9999;
+            display: none;
+            visibility: hidden;
+            border: 3px solid var(--dropdown-border-color);
+        }
+
+        .dropdown.active .dropdown-menu {
+            display: block;
+            visibility: visible;
+        }
+
+        .dropdown-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-color-base);
+            transition: background 0.1s;
+            border-bottom: 1px solid var(--border-color-gray);
+        }
+
+            .dropdown-menu-item:last-child {
+                border-bottom: none;
+            }
+
+            .dropdown-menu-item:hover {
+                background: var(--hover-item-background);
+            }
+
+            .dropdown-menu-item.move:hover {
+                background: #e3f2fd;
+            }
+
+            .dropdown-menu-item.negotiate:hover {
+                background: #fff8e1;
+            }
+
+            .dropdown-menu-item.delete:hover {
+                background: #ffebee;
+                color: var(--btn-danger-background);
+            }
+
+        .editable-cell {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
+
+            .editable-cell:hover {
+                background: var(--icon-background-black);
+                outline: 1px dashed var(--border-color-gray-dark);
+            }
+
+        .photo-cell {
+            cursor: pointer;
+            text-align: center;
+            background: #fafafa;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+            .photo-cell:hover {
+                background: #f0f0f0;
+                outline: 1px dashed var(--border-color-gray-dark);
+            }
+
+        .edit-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+            .edit-overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+        .editable-cell.editing {
+            position: relative;
+            z-index: 2001;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 2px var(--dropdown-border-color), 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .edit-popup {
+            display: none;
+            position: fixed;
+            background: var(--panel-background);
+            border: 3px solid var(--dropdown-border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            z-index: 2002;
+            min-width: 260px;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+
+            .edit-popup.active {
+                display: flex;
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .edit-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-color-base);
+            border-bottom: 1px solid var(--border-color-gray);
+            padding-bottom: 8px;
+        }
+
+        .edit-popup-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color-gray-dark);
+            border-radius: 4px;
+            font-size: 15px;
+            color: var(--text-color-base);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+            .edit-popup-input:focus {
+                border-color: var(--btn-black-background);
+            }
+
+        .edit-popup-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+            .pagination button {
+                background: var(--panel-background);
+                border: 1px solid var(--border-color-gray);
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 8px 16px;
+                transition: all 0.2s;
+                font-size: 15px;
+                color: var(--text-color-base);
+                font-weight: 500;
+            }
+
+                .pagination button.active {
+                    background: var(--btn-black-background);
+                    border-color: var(--btn-black-background);
+                    color: #fff;
+                }
+
+                .pagination button:hover:not(.active) {
+                    background: var(--hover-item-background);
+                }
+
+        .upload-area {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 40px;
+            text-align: center;
+            border: 2px dashed var(--border-color-gray-dark);
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .upload-area:hover {
+                border-color: var(--btn-black-background);
+            }
+
+            .upload-area.dragover {
+                background-color: var(--hover-item-background);
+                border-color: var(--btn-success-background);
+            }
+
+            .upload-area h3 {
+                font-size: 20px;
+                margin-bottom: 12px;
+                font-weight: 600;
+            }
+
+            .upload-area p {
+                font-size: 15px;
+                color: var(--text-gray);
+                text-align: center;
+            }
+
+        .file-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin: 25px 0;
+            width: 100%;
+        }
+
+        .custom-file-label {
+            background: var(--panel-background);
+            border: 1px solid var(--border-color-gray-dark);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+            .custom-file-label:hover {
+                background: var(--hover-item-background);
+                border-color: var(--btn-black-background);
+            }
+
+        .file-name-display {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .progress-container {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 24px;
+            margin-top: 24px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .progress-container h4 {
+                font-size: 16px;
+                margin-bottom: 12px;
+                font-weight: 500;
+            }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--border-color-gray);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--btn-black-background);
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        .progress-message {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+            .modal.active {
+                display: flex;
+                animation: fadeIn 0.2s ease-out;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-color-base);
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            line-height: 1.4;
+            color: var(--text-gray);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 14px;
+                font-weight: 500;
+                color: var(--text-gray);
+            }
+
+        .alert {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 16px 24px;
+            border-radius: 4px;
+            color: #fff;
+            z-index: 4000;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .alert-success {
+            background: var(--btn-success-background);
+        }
+
+        .alert-error {
+            background: var(--btn-danger-background);
+        }
+
+        .alert-info {
+            background: var(--btn-info-background);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .m_b-10 {
+            margin-bottom: 10px;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .undo-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--btn-black-background);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 999;
+            animation: slideUp 0.3s ease;
+        }
+
+        .upload-confirm-modal {
+            max-width: 450px;
+        }
+
+            .upload-confirm-modal .file-info {
+                background: #f5f5f5;
+                padding: 12px;
+                border-radius: 6px;
+                margin: 15px 0;
+                text-align: left;
+                word-break: break-all;
+            }
+
+                .upload-confirm-modal .file-info p {
+                    margin: 5px 0;
+                    font-size: 14px;
+                }
+
+            .upload-confirm-modal .warning-text {
+                color: #e57373;
+                font-size: 13px;
+                margin-top: 10px;
+            }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .main-layout {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .filter-row, .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                font-size: 13px;
+                padding: 10px 8px;
+            }
+
+            .nav-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+
+            .nav-tab {
+                white-space: nowrap;
+            }
+
+            .btn {
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="editOverlay" class="edit-overlay" onclick="cancelEdit()"></div>
+    <div id="editPopup" class="edit-popup">
+        <div class="edit-popup-header">
+            <span data-i18n="editLabel">Изменение: <span id="editColumnName" style="color: var(--text-gray); font-weight: normal;"></span></span>
+        </div>
+        <input type="text" id="editInput" class="edit-popup-input" data-i18n-placeholder="editPlaceholder" placeholder="Введите новое значение...">
+        <div class="edit-popup-actions">
+            <button class="btn btn--cancel btn--small" onclick="cancelEdit()" data-i18n="cancelBtn">Отмена</button>
+            <button class="btn btn--confirm btn--small" onclick="saveEdit()" data-i18n="saveBtn">Сохранить</button>
+        </div>
+    </div>
+    <input type="file" id="photoUploadInput" accept="image/*" style="display: none;">
+    <div class="container">
+        <div id="mainContent">
+            <div class="header">
+                <h1 data-i18n="adminTitle">Админ панель управления данными</h1>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div class="language-switcher">
+                        <button class="lang-option active" data-lang="ru">RU</button>
+                        <button class="lang-option" data-lang="en">EN</button>
+                    </div>
+                    <div class="user-info">
+                        <span id="userName"></span>
+                        <button class="btn btn--graphite btn--small" onclick="logout()" data-i18n="logoutBtn">Выйти</button>
+                    </div>
+                </div>
+            </div>
+            <div class="main-layout">
+                <div class="sidebar">
+                    <div class="filters-card">
+                        <h3 data-i18n="filtersTitle">Фильтры товаров</h3>
+                        <div class="filter-group"><label data-i18n="filterCodeLabel">Код товара</label><input type="text" id="filterCode" data-i18n-placeholder="filterCodePlaceholder" placeholder="Введите код"></div>
+                        <div class="filter-group"><label data-i18n="filterNameLabel">Название</label><input type="text" id="filterName" data-i18n-placeholder="filterNamePlaceholder" placeholder="Название товара"></div>
+                        <div class="filter-group"><label data-i18n="filterBrandLabel">Бренд</label><input type="text" id="filterBrand" data-i18n-placeholder="filterBrandPlaceholder" placeholder="Бренд"></div>
+                        <div class="filter-group"><label data-i18n="filterModelLabel">Модель</label><input type="text" id="filterModel" data-i18n-placeholder="filterModelPlaceholder" placeholder="Модель"></div>
+                        <div class="filter-group"><label data-i18n="filterPlaceLabel">Место</label><input type="text" id="filterPlace" data-i18n-placeholder="filterPlacePlaceholder" placeholder="Место"></div>
+                        <div class="filter-row">
+                            <div class="filter-group"><label data-i18n="filterQtyMinLabel">Количество от</label><input type="number" id="filterQtyMin" data-i18n-placeholder="filterQtyMinPlaceholder" placeholder="мин"></div>
+                            <div class="filter-group"><label data-i18n="filterQtyMaxLabel">Количество до</label><input type="number" id="filterQtyMax" data-i18n-placeholder="filterQtyMaxPlaceholder" placeholder="макс"></div>
+                        </div>
+                        <div class="filter-row">
+                            <div class="filter-group"><label data-i18n="filterPriceMinLabel">Цена от</label><input type="number" id="filterPriceMin" data-i18n-placeholder="filterPriceMinPlaceholder" placeholder="мин"></div>
+                            <div class="filter-group"><label data-i18n="filterPriceMaxLabel">Цена до</label><input type="number" id="filterPriceMax" data-i18n-placeholder="filterPriceMaxPlaceholder" placeholder="макс"></div>
+                        </div>
+                        <div class="filter-group"><label data-i18n="filterConditionLabel">Состояние</label><input type="text" id="filterCondition" data-i18n-placeholder="filterConditionPlaceholder" placeholder="Состояние товара"></div>
+                        <div class="filter-group"><label data-i18n="filterDateFromLabel">Дата от</label><input type="date" id="filterDateFrom"></div>
+                        <div class="filter-group"><label data-i18n="filterDateToLabel">Дата до</label><input type="date" id="filterDateTo"></div>
+                        <div class="filter-actions">
+                            <button class="btn btn--black btn--small" onclick="applyFilters()" data-i18n="applyBtn">Применить</button>
+                            <button class="btn btn--transparent btn--small" onclick="resetAllFilters()" data-i18n="resetBtn">Сбросить</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-area">
+                    <div class="nav-tabs">
+                        <button class="nav-tab active" data-tab="data" data-i18n="tabPublished">Опубликованные</button>
+                        <button class="nav-tab" data-tab="unpublished" data-i18n="tabUnpublished">Неопубликованные</button>
+                        <button class="nav-tab" data-tab="buffer" data-i18n="tabBuffer">Активные переговоры</button>
+                        <button class="nav-tab" data-tab="history" data-i18n="tabHistory">История продаж</button>
+                        <button class="nav-tab" data-tab="upload" data-i18n="tabUpload">Загрузка</button>
+                    </div>
+                    <div id="dataTab" class="tab-content active">
+                        <div class="table-container">
+                            <div style="overflow-x: auto;">
+                                <table id="dataTable">
+                                    <thead id="tableHeader">
+                                        <tr><th data-sort="id" data-i18n="colID">ID</th><th data-sort="Code" data-i18n="colCode">Код</th><th data-sort="QTY" data-i18n="colQty">Количество</th><th data-sort="NAME" data-i18n="colName">Название</th><th data-sort="Brand" data-i18n="colBrand">Бренд</th><th data-sort="Model" data-i18n="colModel">Модель</th><th data-sort="PLACE" data-i18n="colPlace">Место</th><th data-sort="Price" data-i18n="colPrice">Цена</th><th data-sort="Conditions" data-i18n="colCondition">Состояние</th><th data-sort="Truck_models" data-i18n="colTruckModels">Модели авто</th><th data-sort="Publishing_date" data-i18n="colDate">Дата</th><th data-sort="Description" data-i18n="colDesc">Описание</th><th data-i18n="colPhoto">Фото</th><th data-i18n="colActions">Действия</th></tr>
+                                    </thead>
+                                    <tbody id="tableBody"><tr><td colspan="14" class="text-center" data-i18n="loading">Загрузка...</td></tr></tbody>
+                                </table>
+                            </div>
+                            <div id="pagination" class="pagination"></div>
+                        </div>
+                    </div>
+                    <div id="unpublishedTab" class="tab-content">
+                        <div class="table-container">
+                            <div class="table-header-actions">
+                                <h3 data-i18n="unpublishedTitle">Неопубликованные товары</h3>
+                                <button class="btn btn--black btn--small" onclick="document.getElementById('addItemModal').classList.add('active')" data-i18n="addNewBtn">+ Добавить новый товар</button>
+                            </div>
+                            <div style="overflow-x: auto;">
+                                <table id="unpublishedTable">
+                                    <thead>
+                                        <tr><th data-sort="id" data-i18n="colID">ID</th><th data-sort="Code" data-i18n="colCode">Код</th><th data-sort="QTY" data-i18n="colQty">Количество</th><th data-sort="NAME" data-i18n="colName">Название</th><th data-sort="Brand" data-i18n="colBrand">Бренд</th><th data-sort="Model" data-i18n="colModel">Модель</th><th data-sort="PLACE" data-i18n="colPlace">Место</th><th data-sort="Price" data-i18n="colPrice">Цена</th><th data-sort="Conditions" data-i18n="colCondition">Состояние</th><th data-sort="Truck_models" data-i18n="colTruckModels">Модели авто</th><th data-sort="Publishing_date" data-i18n="colDate">Дата</th><th data-sort="Description" data-i18n="colDesc">Описание</th><th data-i18n="colPhoto">Фото</th><th data-i18n="colActions">Действия</th></tr>
+                                    </thead>
+                                    <tbody id="unpublishedBody"><tr><td colspan="14" class="text-center" data-i18n="loading">Загрузка...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bufferTab" class="tab-content">
+                        <div class="table-container">
+                            <h3 class="m_b-10" data-i18n="bufferTitle">Активные переговоры</h3>
+                            <div style="overflow-x: auto;">
+                                <table id="bufferTable">
+                                    <thead>
+                                        <tr><th data-sort="id" data-i18n="colID">ID</th><th data-sort="Code" data-i18n="colCode">Код</th><th data-sort="QTY" data-i18n="colQty">Количество</th><th data-sort="NAME" data-i18n="colName">Название</th><th data-sort="Price" data-i18n="colPrice">Цена</th><th data-sort="sales_negotiation_start_date" data-i18n="colStartDate">Дата начала</th><th data-sort="Description" data-i18n="colDesc">Описание</th><th data-i18n="colActions">Действия</th></tr>
+                                    </thead>
+                                    <tbody id="bufferBody"><tr><td colspan="8" class="text-center" data-i18n="loading">Загрузка...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="historyTab" class="tab-content">
+                        <div class="table-container">
+                            <h3 class="m_b-10" data-i18n="historyTitle">История продаж</h3>
+                            <div style="overflow-x: auto;">
+                                <table id="historyTable">
+                                    <thead>
+                                        <tr><th data-sort="id" data-i18n="colID">ID</th><th data-sort="Code" data-i18n="colCode">Код</th><th data-sort="QTY" data-i18n="colQty">Количество</th><th data-sort="NAME" data-i18n="colName">Название</th><th data-sort="Price" data-i18n="colPrice">Цена</th><th data-sort="sales_negotiation_start_date" data-i18n="colStartDate">Дата начала</th><th data-sort="sales_negotiation_end_date" data-i18n="colEndDate">Дата завершения</th><th data-sort="Description" data-i18n="colDesc">Описание</th></tr>
+                                    </thead>
+                                    <tbody id="historyBody"><tr><td colspan="8" class="text-center" data-i18n="loading">Загрузка...</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="uploadTab" class="tab-content">
+                        <div class="upload-area" id="dropZone">
+                            <h3 data-i18n="uploadTitle">Загрузка файла данных</h3>
+                            <p data-i18n="uploadDesc">Поддерживаемые форматы: .xlsx, .db. Перетащите файл сюда или нажмите кнопку ниже.</p>
+                            <div class="file-input-wrapper">
+                                <label for="uploadFile" class="custom-file-label" data-i18n="chooseFileBtn">Выбрать файл</label>
+                                <span id="fileNameDisplay" class="file-name-display" data-i18n="noFileText">Файл не выбран</span>
+                                <input type="file" id="uploadFile" accept=".xlsx,.db" style="display: none;" onchange="if(this.files&&this.files.length>0)document.getElementById('fileNameDisplay').textContent=this.files[0].name;else document.getElementById('fileNameDisplay').textContent='Файл не выбран';">
+                            </div>
+                            <button class="btn btn--success" onclick="confirmUploadDialog()" data-i18n="uploadBtn">Загрузить</button>
+                        </div>
+                        <div class="progress-container" id="progressContainer" style="display: none;">
+                            <h4 data-i18n="progressStatus">Статус обработки:</h4>
+                            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                            <div class="progress-message" id="progressMessage">Ожидание действий</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <h3 data-i18n="addItemTitle">Добавить новый товар</h3>
+            <div class="form-row">
+                <div class="form-group"><label data-i18n="addCode">Код</label><input type="text" id="modalNewCode" data-i18n-placeholder="addCodePlaceholder" placeholder="Код товара"></div>
+                <div class="form-group"><label data-i18n="addQty">Количество</label><input type="number" id="modalNewQty" placeholder="Количество" value="1" min="1" step="1" oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value !== '' && parseInt(this.value) < 1) this.value = 1;"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label data-i18n="addName">Название</label><input type="text" id="modalNewName" data-i18n-placeholder="addNamePlaceholder" placeholder="Название товара"></div>
+                <div class="form-group"><label data-i18n="addBrand">Бренд</label><input type="text" id="modalNewBrand" data-i18n-placeholder="addBrandPlaceholder" placeholder="Бренд"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label data-i18n="addModel">Модель</label><input type="text" id="modalNewModel" data-i18n-placeholder="addModelPlaceholder" placeholder="Модель"></div>
+                <div class="form-group"><label data-i18n="addPlace">Место</label><input type="text" id="modalNewPlace" data-i18n-placeholder="addPlacePlaceholder" placeholder="Место"></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label data-i18n="addPrice">Цена</label><input type="number" id="modalNewPrice" placeholder="Цена" value="0" min="0" oninput="this.value = Math.max(0, this.value);"></div>
+                <div class="form-group"><label data-i18n="addCondition">Состояние</label><input type="text" id="modalNewCondition" data-i18n-placeholder="addConditionPlaceholder" placeholder="Состояние"></div>
+            </div>
+            <div class="form-group"><label data-i18n="addTruckModels">Модели авто</label><input type="text" id="modalNewTruckModels" data-i18n-placeholder="addTruckModelsPlaceholder" placeholder="Модели авто (через запятую)"></div>
+            <div class="form-group"><label data-i18n="addDesc">Описание</label><input type="text" id="modalNewDescription" data-i18n-placeholder="addDescPlaceholder" placeholder="Краткое описание"></div>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" onclick="document.getElementById('addItemModal').classList.remove('active')" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--confirm" onclick="addNewItem()" data-i18n="saveBtn">Добавить</button>
+            </div>
+        </div>
+    </div>
+    <div id="negotiateModal" class="modal">
+        <div class="modal-content">
+            <h3 data-i18n="negotiateTitle">Начать переговоры</h3>
+            <p data-i18n="negotiateDesc">Введите количество для продажи:</p>
+            <div class="form-group"><input type="number" id="negotiateQty" value="1" min="1" style="width: 100%; text-align: center;"></div>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" onclick="document.getElementById('negotiateModal').classList.remove('active');negotiateRecordId=null;" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--confirm" onclick="confirmNegotiation()" data-i18n="confirmBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle" data-i18n="confirmTitle">Подтверждение</h3>
+            <p id="modalMessage">Вы уверены, что хотите выполнить это действие?</p>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" id="modalCancelBtn" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--confirm" id="modalConfirmBtn" data-i18n="confirmBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+    <div id="uploadConfirmModal" class="modal">
+        <div class="modal-content upload-confirm-modal">
+            <h3 data-i18n="uploadConfirmTitle">Подтверждение загрузки</h3>
+            <p data-i18n="uploadConfirmMsg">Вы уверены, что хотите загрузить этот файл?</p>
+            <div class="file-info" id="uploadFileInfo">
+                <p><strong data-i18n="fileNameLabel">Название файла:</strong> <span id="confirmFileName"></span></p>
+                <p><strong data-i18n="fileSizeLabel">Размер:</strong> <span id="confirmFileSize"></span></p>
+                <p><strong data-i18n="fileTypeLabel">Тип:</strong> <span id="confirmFileType"></span></p>
+            </div>
+            <p class="warning-text" data-i18n="uploadWarning">Внимание! Загрузка нового файла приведет к обновлению данных.</p>
+            <div class="modal-buttons">
+                <button class="btn btn--cancel" onclick="document.getElementById('uploadConfirmModal').classList.remove('active');pendingUploadFile=null;" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--confirm" onclick="confirmUpload()" data-i18n="confirmBtn">Подтвердить</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const translations = {
+            ru: {
+                adminTitle: 'Админ панель управления данными', logoutBtn: 'Выйти', filtersTitle: 'Фильтры товаров',
+                filterCodeLabel: 'Код товара', filterCodePlaceholder: 'Введите код',
+                filterNameLabel: 'Название', filterNamePlaceholder: 'Название товара',
+                filterBrandLabel: 'Бренд', filterBrandPlaceholder: 'Бренд',
+                filterModelLabel: 'Модель', filterModelPlaceholder: 'Модель',
+                filterPlaceLabel: 'Место', filterPlacePlaceholder: 'Место',
+                filterQtyMinLabel: 'Количество от', filterQtyMinPlaceholder: 'мин',
+                filterQtyMaxLabel: 'Количество до', filterQtyMaxPlaceholder: 'макс',
+                filterPriceMinLabel: 'Цена от', filterPriceMinPlaceholder: 'мин',
+                filterPriceMaxLabel: 'Цена до', filterPriceMaxPlaceholder: 'макс',
+                filterConditionLabel: 'Состояние', filterConditionPlaceholder: 'Состояние товара',
+                filterDateFromLabel: 'Дата от', filterDateToLabel: 'Дата до',
+                applyBtn: 'Применить', resetBtn: 'Сбросить',
+                tabPublished: 'Опубликованные', tabUnpublished: 'Неопубликованные', tabBuffer: 'Активные переговоры', tabHistory: 'История продаж', tabUpload: 'Загрузка',
+                colID: 'ID', colCode: 'Код', colQty: 'Количество', colName: 'Название', colBrand: 'Бренд', colModel: 'Модель', colPlace: 'Место', colPrice: 'Цена', colCondition: 'Состояние', colTruckModels: 'Модели авто', colDate: 'Дата', colDesc: 'Описание', colPhoto: 'Фото', colActions: 'Действия',
+                unpublishedTitle: 'Неопубликованные товары', addNewBtn: '+ Добавить новый товар', bufferTitle: 'Активные переговоры', historyTitle: 'История продаж',
+                uploadTitle: 'Загрузка файла данных', uploadDesc: 'Поддерживаемые форматы: .xlsx, .db. Перетащите файл сюда или нажмите кнопку ниже.',
+                chooseFileBtn: 'Выбрать файл', noFileText: 'Файл не выбран', uploadBtn: 'Загрузить', progressStatus: 'Статус обработки:', loading: 'Загрузка...',
+                addItemTitle: 'Добавить новый товар', addCode: 'Код', addCodePlaceholder: 'Код товара', addQty: 'Количество', addName: 'Название', addNamePlaceholder: 'Название товара', addBrand: 'Бренд', addBrandPlaceholder: 'Бренд', addModel: 'Модель', addModelPlaceholder: 'Модель', addPlace: 'Место', addPlacePlaceholder: 'Место', addPrice: 'Цена', addCondition: 'Состояние', addConditionPlaceholder: 'Состояние', addTruckModels: 'Модели авто', addTruckModelsPlaceholder: 'Модели авто (через запятую)', addDesc: 'Описание', addDescPlaceholder: 'Краткое описание',
+                negotiateTitle: 'Начать переговоры', negotiateDesc: 'Введите количество для продажи:',
+                confirmTitle: 'Подтверждение', confirmBtn: 'Подтвердить', cancelBtn: 'Отмена', saveBtn: 'Сохранить',
+                editLabel: 'Изменение:', editPlaceholder: 'Введите новое значение...',
+                uploadConfirmTitle: 'Подтверждение загрузки', uploadConfirmMsg: 'Вы уверены, что хотите загрузить этот файл?', fileNameLabel: 'Название файла:', fileSizeLabel: 'Размер:', fileTypeLabel: 'Тип:', uploadWarning: 'Внимание! Загрузка нового файла приведет к обновлению данных.',
+                actionPublish: 'В "Опубликованные"', actionDelete: 'Удалить', actionDraft: 'В "Неопубликованные"', actionNegotiate: 'Переговоры', actionComplete: 'Завершить', actionCancel: 'Отменить',
+                noData: 'Нет данных', noBuffer: 'Нет активных переговоров', noHistory: 'Нет истории',
+                deleteConfirmMsg: 'Вы удаляете товар', moveConfirmMsg: 'Переместить товар', moveTargetPub: 'опубликованные', moveTargetUnpub: 'неопубликованные', endNegotiateConfirm: 'Завершить переговоры для товара', cancelNegotiateConfirm: 'Отменить транзакцию для',
+                successUpdate: 'Обновлено', successMove: 'Перемещено', successDelete: 'Товар удален. Ctrl+Z для отмены', successNegotiationStart: 'Переговоры начаты', successNegotiationEnd: 'Переговоры завершены', successCancel: 'Транзакция отменена', successAdd: 'Товар успешно добавлен', successUpload: 'Файл успешно загружен и обработан. Страница будет обновлена...',
+                errorLoad: 'Ошибка загрузки', errorConnection: 'Ошибка подключения', errorAdd: 'Заполните обязательные поля: Код и Название', errorInvalidQty: 'Введите корректное количество', errorDeleteLate: 'Слишком поздно для отмены', noUndo: 'Нет действий для отката (Ctrl+Z)', noRedo: 'Нет действий для повтора (Ctrl+Y)'
+            },
+            en: {
+                adminTitle: 'Admin Data Management Panel', logoutBtn: 'Logout', filtersTitle: 'Product Filters',
+                filterCodeLabel: 'Product Code', filterCodePlaceholder: 'Enter code',
+                filterNameLabel: 'Name', filterNamePlaceholder: 'Product name',
+                filterBrandLabel: 'Brand', filterBrandPlaceholder: 'Brand',
+                filterModelLabel: 'Model', filterModelPlaceholder: 'Model',
+                filterPlaceLabel: 'Location', filterPlacePlaceholder: 'Location',
+                filterQtyMinLabel: 'Qty from', filterQtyMinPlaceholder: 'min',
+                filterQtyMaxLabel: 'Qty to', filterQtyMaxPlaceholder: 'max',
+                filterPriceMinLabel: 'Price from', filterPriceMinPlaceholder: 'min',
+                filterPriceMaxLabel: 'Price to', filterPriceMaxPlaceholder: 'max',
+                filterConditionLabel: 'Condition', filterConditionPlaceholder: 'Condition',
+                filterDateFromLabel: 'Date from', filterDateToLabel: 'Date to',
+                applyBtn: 'Apply', resetBtn: 'Reset',
+                tabPublished: 'Published', tabUnpublished: 'Unpublished', tabBuffer: 'Active Negotiations', tabHistory: 'Sales History', tabUpload: 'Upload',
+                colID: 'ID', colCode: 'Code', colQty: 'Qty', colName: 'Name', colBrand: 'Brand', colModel: 'Model', colPlace: 'Location', colPrice: 'Price', colCondition: 'Condition', colTruckModels: 'Vehicle models', colDate: 'Date', colDesc: 'Description', colPhoto: 'Photo', colActions: 'Actions',
+                unpublishedTitle: 'Unpublished Items', addNewBtn: '+ Add new item', bufferTitle: 'Active negotiations', historyTitle: 'Sales History',
+                uploadTitle: 'Upload Data File', uploadDesc: 'Supported formats: .xlsx, .db. Drag & drop or click below.',
+                chooseFileBtn: 'Choose file', noFileText: 'No file chosen', uploadBtn: 'Upload', progressStatus: 'Processing status:', loading: 'Loading...',
+                addItemTitle: 'Add New Item', addCode: 'Code', addCodePlaceholder: 'Product code', addQty: 'Qty', addName: 'Name', addNamePlaceholder: 'Product name', addBrand: 'Brand', addBrandPlaceholder: 'Brand', addModel: 'Model', addModelPlaceholder: 'Model', addPlace: 'Location', addPlacePlaceholder: 'Location', addPrice: 'Price', addCondition: 'Condition', addConditionPlaceholder: 'Condition', addTruckModels: 'Vehicle models', addTruckModelsPlaceholder: 'Vehicle models (comma separated)', addDesc: 'Description', addDescPlaceholder: 'Short description',
+                negotiateTitle: 'Start negotiation', negotiateDesc: 'Enter quantity to sell:',
+                confirmTitle: 'Confirmation', confirmBtn: 'Confirm', cancelBtn: 'Cancel', saveBtn: 'Save',
+                editLabel: 'Edit:', editPlaceholder: 'Enter new value...',
+                uploadConfirmTitle: 'Confirm Upload', uploadConfirmMsg: 'Are you sure you want to upload this file?', fileNameLabel: 'File name:', fileSizeLabel: 'Size:', fileTypeLabel: 'Type:', uploadWarning: 'Warning! Uploading a new file will update all data.',
+                actionPublish: 'To "Published"', actionDelete: 'Delete', actionDraft: 'To "Unpublished"', actionNegotiate: 'Negotiate', actionComplete: 'Complete', actionCancel: 'Cancel',
+                noData: 'No data', noBuffer: 'No active negotiations', noHistory: 'No history',
+                deleteConfirmMsg: 'You are deleting item', moveConfirmMsg: 'Move item', moveTargetPub: 'published', moveTargetUnpub: 'unpublished', endNegotiateConfirm: 'Complete negotiation for item', cancelNegotiateConfirm: 'Cancel transaction for',
+                successUpdate: 'Updated', successMove: 'Moved', successDelete: 'Item deleted. Ctrl+Z to undo', successNegotiationStart: 'Negotiation started', successNegotiationEnd: 'Negotiation completed', successCancel: 'Transaction cancelled', successAdd: 'Item added successfully', successUpload: 'File uploaded and processed. Page will refresh...',
+                errorLoad: 'Error loading data', errorConnection: 'Connection error', errorAdd: 'Please fill required fields: Code and Name', errorInvalidQty: 'Enter a valid quantity', errorDeleteLate: 'Too late to undo', noUndo: 'Nothing to undo (Ctrl+Z)', noRedo: 'Nothing to redo (Ctrl+Y)'
+            }
+        };
+
+        let currentLang = localStorage.getItem('appLang') || 'ru';
+        
+        function t(key) { 
+            return translations[currentLang] && translations[currentLang][key] !== undefined ? translations[currentLang][key] : key; 
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (key && translations[currentLang][key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[currentLang][key];
+                    else el.textContent = translations[currentLang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (key && translations[currentLang][key]) el.placeholder = translations[currentLang][key];
+            });
+            document.documentElement.lang = currentLang === 'ru' ? 'ru' : 'en';
+            document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+            loadData(); loadUnpublished(); loadBufferSales(); loadSalesHistory();
+            if (currentTab === 'data') loadData();
+            else if (currentTab === 'unpublished') filterAndRenderUnpublished();
+            else if (currentTab === 'buffer') filterAndRenderBuffer();
+            else if (currentTab === 'history') filterAndRenderHistory();
+        }
+        function getClientTime() { return new Date().toISOString(); }
+        async function fetchWithTime(url, options = {}) {
+            const headers = new Headers(options.headers || {});
+            headers.set('X-Client-Time', new Date().toISOString());
+            options.headers = headers;
+            return fetch(url, options);
+        }
+        let undoBuffer = { hasUndo: false, rowId: null, column: null, oldValue: null, newValue: null, tableName: null, actionType: null, source: null, trNode: null };
+        let redoBuffer = { hasRedo: false, rowId: null, column: null, oldValue: null, newValue: null, tableName: null, actionType: null, source: null, trNode: null };
+        let pendingUploadFile = null;
+        const pendingDeletions = new Map();
+        document.addEventListener('keydown', function (e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+                e.preventDefault(); e.stopPropagation();
+                if (!undoBuffer.hasUndo) { showAlert(t('noUndo'), 'info'); return false; }
+                if (undoBuffer.actionType === 'delete') {
+                    if (pendingDeletions.has(undoBuffer.rowId)) {
+                        clearTimeout(pendingDeletions.get(undoBuffer.rowId));
+                        pendingDeletions.delete(undoBuffer.rowId);
+                        if (undoBuffer.trNode) undoBuffer.trNode.style.display = '';
+                        showAlert(t('successCancel'), 'success');
+                        redoBuffer = { hasRedo: true, actionType: 'delete', rowId: undoBuffer.rowId, trNode: undoBuffer.trNode };
+                        undoBuffer = { hasUndo: false };
+                        document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                        return true;
+                    } else { showAlert(t('errorDeleteLate'), 'error'); return false; }
+                } else if (undoBuffer.actionType === 'move') {
+                    const oppSource = undoBuffer.source === 'pub' ? 'unpub' : 'pub';
+                    (async () => {
+                        try {
+                            const resp = await fetchWithTime(API_BASE + '/admin/move-row', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ source: oppSource, id: undoBuffer.rowId }) });
+                            if (resp.ok) {
+                                showAlert(t('successMove'), 'success');
+                                redoBuffer = { hasRedo: true, actionType: 'move', rowId: undoBuffer.rowId, source: undoBuffer.source };
+                                undoBuffer = { hasUndo: false };
+                                document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                                await loadData(); await loadUnpublished();
+                                return true;
+                            }
+                        } catch (e) { }
+                    })();
+                } else if (undoBuffer.actionType === 'edit') {
+                    redoBuffer = { hasRedo: true, actionType: 'edit', rowId: undoBuffer.rowId, column: undoBuffer.column, oldValue: undoBuffer.newValue, newValue: undoBuffer.oldValue, tableName: undoBuffer.tableName };
+                    (async () => {
+                        try {
+                            const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('data-tab');
+                            let tableType = activeTab === 'data' ? 'published' : (activeTab === 'unpublished' ? 'unpublished' : (activeTab === 'buffer' ? 'buffer' : 'history'));
+                            const response = await fetchWithTime(API_BASE + '/admin/table/update-cell', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: undoBuffer.rowId, column_name: undoBuffer.column, new_value: (undoBuffer.oldValue === null || undoBuffer.oldValue === undefined ? '' : String(undoBuffer.oldValue)), table_type: tableType }) });
+                            if (response && response.ok) {
+                                let tableId = activeTab === 'data' ? 'dataTable' : (activeTab === 'unpublished' ? 'unpublishedTable' : (activeTab === 'buffer' ? 'bufferTable' : 'historyTable'));
+                                const table = document.getElementById(tableId);
+                                if (table) {
+                                    for (let row of table.querySelectorAll('tbody tr')) {
+                                        if (row.cells[0] && row.cells[0].innerText == undoBuffer.rowId) {
+                                            const headers = table.querySelectorAll('thead th');
+                                            let colIdx = -1;
+                                            for (let i = 0; i < headers.length; i++) if (headers[i].innerText === undoBuffer.column || headers[i].getAttribute('data-sort') === undoBuffer.column) { colIdx = i; break; }
+                                            if (colIdx !== -1 && row.cells[colIdx]) row.cells[colIdx].innerText = (undoBuffer.oldValue === null || undoBuffer.oldValue === undefined ? '' : String(undoBuffer.oldValue));
+                                            break;
+                                        }
+                                    }
+                                }
+                                showAlert(t('successUpdate'), 'success');
+                                undoBuffer = { hasUndo: false };
+                                document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                                await loadData(); await loadUnpublished(); await loadBufferSales(); await loadSalesHistory();
+                                return true;
+                            } else { redoBuffer = { hasRedo: false }; return false; }
+                        } catch (error) { return false; }
+                    })();
+                }
+                return false;
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                e.preventDefault(); e.stopPropagation();
+                if (!redoBuffer.hasRedo) { showAlert(t('noRedo'), 'info'); return false; }
+                if (redoBuffer.actionType === 'delete') { deleteRow(redoBuffer.rowId); redoBuffer = { hasRedo: false }; return true; }
+                else if (redoBuffer.actionType === 'move') { moveRow(redoBuffer.rowId, redoBuffer.source); redoBuffer = { hasRedo: false }; return true; }
+                else if (redoBuffer.actionType === 'edit') {
+                    const valToRestore = redoBuffer.oldValue;
+                    (async () => {
+                        try {
+                            const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('data-tab');
+                            let tableType = activeTab === 'data' ? 'published' : (activeTab === 'unpublished' ? 'unpublished' : (activeTab === 'buffer' ? 'buffer' : 'history'));
+                            const response = await fetchWithTime(API_BASE + '/admin/table/update-cell', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: redoBuffer.rowId, column_name: redoBuffer.column, new_value: (valToRestore === null || valToRestore === undefined ? '' : String(valToRestore)), table_type: tableType }) });
+                            if (response && response.ok) {
+                                let tableId = activeTab === 'data' ? 'dataTable' : (activeTab === 'unpublished' ? 'unpublishedTable' : (activeTab === 'buffer' ? 'bufferTable' : 'historyTable'));
+                                const table = document.getElementById(tableId);
+                                if (table) {
+                                    for (let row of table.querySelectorAll('tbody tr')) {
+                                        if (row.cells[0] && row.cells[0].innerText == redoBuffer.rowId) {
+                                            const headers = table.querySelectorAll('thead th');
+                                            let colIdx = -1;
+                                            for (let i = 0; i < headers.length; i++) if (headers[i].innerText === redoBuffer.column || headers[i].getAttribute('data-sort') === redoBuffer.column) { colIdx = i; break; }
+                                            if (colIdx !== -1 && row.cells[colIdx]) row.cells[colIdx].innerText = (valToRestore === null || valToRestore === undefined ? '' : String(valToRestore));
+                                            break;
+                                        }
+                                    }
+                                }
+                                undoBuffer = { hasUndo: true, actionType: 'edit', rowId: redoBuffer.rowId, column: redoBuffer.column, oldValue: redoBuffer.newValue, newValue: valToRestore, tableName: redoBuffer.tableName };
+                                document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                                let ind = document.createElement('div'); ind.className = 'undo-indicator'; ind.innerHTML = 'Ctrl+Z для відкату'; document.body.appendChild(ind); setTimeout(() => ind.remove(), 3000);
+                                redoBuffer = { hasRedo: false };
+                                showAlert(t('successUpdate'), 'success');
+                                await loadData(); await loadUnpublished(); await loadBufferSales(); await loadSalesHistory();
+                                return true;
+                            } else { return false; }
+                        } catch (error) { return false; }
+                    })();
+                    return false;
+                }
+                return false;
+            }
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z') { e.preventDefault(); e.stopPropagation(); document.dispatchEvent(new KeyboardEvent('keydown', { key: 'y', ctrlKey: true, metaKey: e.metaKey })); return false; }
+        });
+        async function confirmUpload() {
+            document.getElementById('uploadConfirmModal').classList.remove('active');
+            if (!pendingUploadFile) { showAlert(t('errorLoad'), 'error'); return; }
+            const formData = new FormData();
+            formData.append('file', pendingUploadFile);
+            const pCont = document.getElementById('progressContainer'), pFill = document.getElementById('progressFill'), pMsg = document.getElementById('progressMessage');
+            if (pCont) pCont.style.display = 'block';
+            if (pFill) pFill.style.width = '0%';
+            if (pMsg) pMsg.textContent = 'Отправка файла на сервер...';
+            try {
+                const resp = await fetchWithTime(API_BASE + '/upload', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData });
+                if (resp.ok) {
+                    if (pFill) pFill.style.width = '100%';
+                    if (pMsg) pMsg.textContent = 'Успешно завершено';
+                    showAlert(t('successUpload'), 'success');
+                    setTimeout(() => location.reload(), 2000);
+                } else {
+                    const errData = await resp.json();
+                    if (pFill) { pFill.style.width = '100%'; pFill.style.background = 'var(--btn-danger-background)'; }
+                    if (pMsg) pMsg.textContent = 'Ошибка';
+                    showAlert(errData.detail || t('errorLoad'), 'error');
+                    setTimeout(() => { if (pCont) pCont.style.display = 'none'; if (pFill) pFill.style.background = 'var(--btn-black-background)'; }, 2000);
+                }
+            } catch (e) {
+                if (pFill) { pFill.style.width = '100%'; pFill.style.background = 'var(--btn-danger-background)'; }
+                if (pMsg) pMsg.textContent = 'Ошибка подключения';
+                showAlert(t('errorConnection'), 'error');
+                setTimeout(() => { if (pCont) pCont.style.display = 'none'; if (pFill) pFill.style.background = 'var(--btn-black-background)'; }, 2000);
+            }
+        }
+        let token = localStorage.getItem('adminToken');
+        let currentUser = null, currentPage = 1, currentFilters = {}, totalPages = 1, ws = null, publishedData = [], unpublishedData = [], bufferData = [], historyData = [], currentTab = 'data';
+        let sortState = { published: { column: 'id', order: 'asc' }, unpublished: { column: 'id', order: 'asc' }, buffer: { column: 'id', order: 'asc' }, history: { column: 'id', order: 'asc' } };
+        const API_BASE = window.location.origin;
+        let currentEditingCell = null, originalValue = "", editingRowId = null, editingColumn = null, photoUploadRecordId = null, negotiateRecordId = null;
+        const modal = document.getElementById('confirmModal'), modalTitle = document.getElementById('modalTitle'), modalMessage = document.getElementById('modalMessage'), modalConfirmBtn = document.getElementById('modalConfirmBtn'), modalCancelBtn = document.getElementById('modalCancelBtn'), negotiateModalEl = document.getElementById('negotiateModal');
+        let editOverlay, editPopup, editInput, editColumnNameLabel;
+        function showConfirmModal(title, message, onConfirm) {
+            modalTitle.textContent = title; modalMessage.textContent = message; modal.classList.add('active');
+            const confirmHandler = () => { modal.classList.remove('active'); modalConfirmBtn.removeEventListener('click', confirmHandler); modalCancelBtn.removeEventListener('click', cancelHandler); onConfirm(); };
+            const cancelHandler = () => { modal.classList.remove('active'); modalConfirmBtn.removeEventListener('click', confirmHandler); modalCancelBtn.removeEventListener('click', cancelHandler); };
+            modalConfirmBtn.addEventListener('click', confirmHandler); modalCancelBtn.addEventListener('click', cancelHandler);
+        }
+
+        modal.addEventListener('click', function (e) { if (e.target === modal) modal.classList.remove('active'); });
+        function showAlert(msg, type) {
+            const alertDiv = document.createElement('div'); alertDiv.className = 'alert alert-' + type; alertDiv.textContent = msg; document.body.appendChild(alertDiv); setTimeout(() => alertDiv.remove(), 3000);
+        }
+
+        function resetAllFilters() {
+            ['filterCode', 'filterName', 'filterBrand', 'filterModel', 'filterPlace', 'filterQtyMin', 'filterQtyMax', 'filterPriceMin', 'filterPriceMax', 'filterCondition', 'filterDateFrom', 'filterDateTo'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            currentFilters = {}; currentPage = 1; loadData(); filterAndRenderUnpublished(); filterAndRenderBuffer(); filterAndRenderHistory();
+        }
+
+        function confirmUploadDialog() {
+            const f = document.getElementById('uploadFile').files[0];
+            if (f) { document.getElementById('uploadConfirmModal').classList.add('active'); document.getElementById('confirmFileName').textContent = f.name; document.getElementById('confirmFileSize').textContent = f.size === 0 ? '0 Bytes' : parseFloat((f.size / Math.pow(1024, Math.floor(Math.log(f.size) / Math.log(1024)))).toFixed(2)) + ' ' + ['Bytes', 'KB', 'MB', 'GB'][Math.floor(Math.log(f.size) / Math.log(1024))]; document.getElementById('confirmFileType').textContent = f.type || 'application/octet-stream'; pendingUploadFile = f; }
+            else showAlert(t('errorLoad'), 'error');
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!token) { window.location.href = '/login'; return; }
+            (async () => {
+                try {
+                    const resp = await fetchWithTime(API_BASE + '/admin/me', { headers: { 'Authorization': 'Bearer ' + token } });
+                    if (resp.ok) { currentUser = await resp.json(); document.getElementById('mainContent').style.display = 'block'; document.getElementById('userName').textContent = currentUser.username + ' (' + currentUser.email + ')'; await loadData(); await loadUnpublished(); await loadBufferSales(); await loadSalesHistory(); }
+                    else { localStorage.removeItem('adminToken'); window.location.href = '/login'; }
+                } catch (e) { localStorage.removeItem('adminToken'); window.location.href = '/login'; }
+            })();
+            if (token) { ws = new WebSocket(API_BASE.replace('http', 'ws') + '/ws/progress?token=' + token); ws.onmessage = (e) => { const data = JSON.parse(e.data); const c = document.getElementById('progressContainer'), f = document.getElementById('progressFill'), m = document.getElementById('progressMessage'); if (f) { f.style.width = data.progress + '%'; f.textContent = data.progress + '%'; } if (m) m.textContent = data.message || 'Обробка...'; if (data.status === 'completed') { showAlert(t('successUpload'), 'success'); loadData(); loadUnpublished(); loadBufferSales(); loadSalesHistory(); setTimeout(() => { if (c) c.style.display = 'none'; }, 2000); } else if (data.status === 'error') { showAlert(t('errorLoad'), 'error'); setTimeout(() => { if (c) c.style.display = 'none'; }, 2000); } }; }
+            ['filterCode', 'filterName', 'filterBrand', 'filterModel', 'filterPlace', 'filterQtyMin', 'filterQtyMax', 'filterPriceMin', 'filterPriceMax', 'filterCondition', 'filterDateFrom', 'filterDateTo'].forEach(id => { const el = document.getElementById(id); if (el) el.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyFilters(); } }); });
+            const tabs = document.querySelectorAll('.nav-tab'); tabs.forEach(tab => { tab.addEventListener('click', function (e) { const tabName = this.getAttribute('data-tab'); document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById(tabName + 'Tab').classList.add('active'); tabs.forEach(b => b.classList.remove('active')); this.classList.add('active'); currentTab = tabName; }); });
+            document.querySelectorAll('#dataTable th[data-sort]').forEach(th => th.addEventListener('click', function () { const column = this.getAttribute('data-sort'); if (sortState.published.column === column) sortState.published.order = sortState.published.order === 'asc' ? 'desc' : 'asc'; else { sortState.published.column = column; sortState.published.order = 'asc'; } currentFilters.sort_by = column; currentFilters.sort_order = sortState.published.order; const table = document.getElementById('dataTable'); if (table) table.querySelectorAll('th').forEach(th => { th.classList.remove('sorted-asc', 'sorted-desc'); if (th.getAttribute('data-sort') === sortState.published.column) th.classList.add(sortState.published.order === 'asc' ? 'sorted-asc' : 'sorted-desc'); }); loadData(); }));
+            document.querySelectorAll('#unpublishedTable th[data-sort]').forEach(th => th.addEventListener('click', function () { const column = this.getAttribute('data-sort'); if (sortState.unpublished.column === column) sortState.unpublished.order = sortState.unpublished.order === 'asc' ? 'desc' : 'asc'; else { sortState.unpublished.column = column; sortState.unpublished.order = 'asc'; } const table = document.getElementById('unpublishedTable'); if (table) table.querySelectorAll('th').forEach(th => { th.classList.remove('sorted-asc', 'sorted-desc'); if (th.getAttribute('data-sort') === sortState.unpublished.column) th.classList.add(sortState.unpublished.order === 'asc' ? 'sorted-asc' : 'sorted-desc'); }); filterAndRenderUnpublished(); }));
+            document.querySelectorAll('#bufferTable th[data-sort]').forEach(th => th.addEventListener('click', function () { const column = this.getAttribute('data-sort'); if (sortState.buffer.column === column) sortState.buffer.order = sortState.buffer.order === 'asc' ? 'desc' : 'asc'; else { sortState.buffer.column = column; sortState.buffer.order = 'asc'; } const table = document.getElementById('bufferTable'); if (table) table.querySelectorAll('th').forEach(th => { th.classList.remove('sorted-asc', 'sorted-desc'); if (th.getAttribute('data-sort') === sortState.buffer.column) th.classList.add(sortState.buffer.order === 'asc' ? 'sorted-asc' : 'sorted-desc'); }); filterAndRenderBuffer(); }));
+            document.querySelectorAll('#historyTable th[data-sort]').forEach(th => th.addEventListener('click', function () { const column = this.getAttribute('data-sort'); if (sortState.history.column === column) sortState.history.order = sortState.history.order === 'asc' ? 'desc' : 'asc'; else { sortState.history.column = column; sortState.history.order = 'asc'; } const table = document.getElementById('historyTable'); if (table) table.querySelectorAll('th').forEach(th => { th.classList.remove('sorted-asc', 'sorted-desc'); if (th.getAttribute('data-sort') === sortState.history.column) th.classList.add(sortState.history.order === 'asc' ? 'sorted-asc' : 'sorted-desc'); }); filterAndRenderHistory(); }));
+            editOverlay = document.getElementById('editOverlay'); editPopup = document.getElementById('editPopup'); editInput = document.getElementById('editInput'); editColumnNameLabel = document.getElementById('editColumnName');
+            editInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); saveEdit(); } else if (e.key === 'Escape') { e.preventDefault(); cancelEdit(); } });
+            document.getElementById('photoUploadInput').addEventListener('change', async function () { if (!this.files || !this.files[0] || !photoUploadRecordId) return; const formData = new FormData(); formData.append('record_id', photoUploadRecordId); formData.append('file', this.files[0]); try { const resp = await fetchWithTime(API_BASE + '/admin/table/update-photo', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token }, body: formData }); if (resp.ok) { showAlert(t('successUpdate'), 'success'); await loadData(); await loadUnpublished(); await loadBufferSales(); await loadSalesHistory(); } else { const err = await resp.json(); showAlert(err.detail || t('errorLoad'), 'error'); } } catch (e) { showAlert(t('errorConnection'), 'error'); } finally { this.value = ''; photoUploadRecordId = null; } });
+            negotiateModalEl.addEventListener('click', function (e) { if (e.target === negotiateModalEl) { document.getElementById('negotiateModal').classList.remove('active'); negotiateRecordId = null; } });
+            const dropZone = document.getElementById('dropZone'), fileInput = document.getElementById('uploadFile');
+            if (dropZone && fileInput) { dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); }); dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); }); dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) { fileInput.files = e.dataTransfer.files; const event = new Event('change'); fileInput.dispatchEvent(event); } }); }
+            setTimeout(() => { showAlert('Гарячі клавіші: Ctrl+Z - відкат, Ctrl+Y - повтор', 'info'); }, 2000);
+            document.querySelectorAll('[data-i18n]').forEach(el => { const key = el.getAttribute('data-i18n'); if (key && translations[currentLang][key]) { if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[currentLang][key]; else el.textContent = translations[currentLang][key]; } });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { const key = el.getAttribute('data-i18n-placeholder'); if (key && translations[currentLang][key]) el.placeholder = translations[currentLang][key]; });
+            document.documentElement.lang = currentLang === 'ru' ? 'ru' : 'en';
+            document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+            document.querySelectorAll('.lang-option').forEach(btn => { btn.onclick = () => setLanguage(btn.dataset.lang); });
+        });
+        function triggerPhotoUpload(id) { photoUploadRecordId = id; document.getElementById('photoUploadInput').click(); }
+
+        function openEdit(cell, id, columnName) {
+            if (currentEditingCell) cancelEdit();
+            currentEditingCell = cell; editingRowId = id; editingColumn = columnName; originalValue = cell.innerText.trim();
+            editColumnNameLabel.textContent = columnName; editInput.value = originalValue;
+            cell.classList.add('editing'); editOverlay.classList.add('active'); editPopup.classList.add('active');
+            requestAnimationFrame(() => { const cellRect = cell.getBoundingClientRect(), popupRect = editPopup.getBoundingClientRect(); let topPos = cellRect.top - popupRect.height - 10, leftPos = cellRect.left; if (topPos < 10) topPos = cellRect.bottom + 10; if (leftPos + popupRect.width > window.innerWidth) leftPos = window.innerWidth - popupRect.width - 20; editPopup.style.top = `${topPos}px`; editPopup.style.left = `${leftPos}px`; editInput.focus(); editInput.select(); });
+        }
+
+        function cancelEdit() { if (!currentEditingCell) return; if (currentEditingCell) currentEditingCell.classList.remove('editing'); document.getElementById('editOverlay').classList.remove('active'); document.getElementById('editPopup').classList.remove('active'); currentEditingCell = null; editingRowId = null; editingColumn = null; }
+
+        async function saveEdit() {
+            if (!currentEditingCell) return;
+            const newValue = editInput.value.trim(), id = editingRowId, column = editingColumn, oldValue = originalValue;
+            let tableName = 'published';
+            const actTab = document.querySelector('.nav-tab.active')?.getAttribute('data-tab');
+            if (actTab === 'unpublished') tableName = 'unpublished'; else if (actTab === 'buffer') tableName = 'buffer'; else if (actTab === 'history') tableName = 'history';
+            if (newValue !== oldValue) {
+                undoBuffer = { hasUndo: true, actionType: 'edit', rowId: id, column: column, oldValue: (oldValue === null || oldValue === undefined ? '' : String(oldValue)), newValue: (newValue === null || newValue === undefined ? '' : String(newValue)), tableName: tableName };
+                redoBuffer = { hasRedo: false };
+                document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                let ind = document.createElement('div'); ind.className = 'undo-indicator'; ind.innerHTML = 'Ctrl+Z для відкату'; document.body.appendChild(ind); setTimeout(() => ind.remove(), 3000);
+                try {
+                    const resp = await fetchWithTime(API_BASE + '/admin/table/update-cell', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: id, column_name: column, new_value: newValue }) });
+                    if (resp.ok) {
+                        showAlert(t('successUpdate'), 'success');
+                        if (currentEditingCell) currentEditingCell.classList.remove('editing'); document.getElementById('editOverlay').classList.remove('active'); document.getElementById('editPopup').classList.remove('active'); currentEditingCell = null; editingRowId = null; editingColumn = null;
+                        await loadData(); await loadUnpublished(); await loadBufferSales(); await loadSalesHistory();
+                    } else {
+                        showAlert(t('errorLoad'), 'error');
+                        if (currentEditingCell) currentEditingCell.classList.remove('editing'); document.getElementById('editOverlay').classList.remove('active'); document.getElementById('editPopup').classList.remove('active'); currentEditingCell = null; editingRowId = null; editingColumn = null;
+                        undoBuffer = { hasUndo: false }; document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                    }
+                } catch (e) {
+                    showAlert(t('errorConnection'), 'error');
+                    if (currentEditingCell) currentEditingCell.classList.remove('editing'); document.getElementById('editOverlay').classList.remove('active'); document.getElementById('editPopup').classList.remove('active'); currentEditingCell = null; editingRowId = null; editingColumn = null;
+                    undoBuffer = { hasUndo: false }; document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                }
+            } else { if (currentEditingCell) currentEditingCell.classList.remove('editing'); document.getElementById('editOverlay').classList.remove('active'); document.getElementById('editPopup').classList.remove('active'); currentEditingCell = null; editingRowId = null; editingColumn = null; }
+        }
+        function filterDataByFilters(data, filters) {
+            if (!data || !data.length) return [];
+            return data.filter(row => {
+                for (let key in filters) {
+                    if (filters[key] === null || filters[key] === '' || filters[key] === undefined) continue;
+                    let rowValue = row[key] !== undefined && row[key] !== null ? row[key] : '';
+                    const filterValue = filters[key].toString().toLowerCase();
+                    if (key === 'qty_min') { if (parseInt(row.QTY) < parseInt(filterValue)) return false; }
+                    else if (key === 'qty_max') { if (parseInt(row.QTY) > parseInt(filterValue)) return false; }
+                    else if (key === 'price_min') { if (parseInt(row.Price) < parseInt(filterValue)) return false; }
+                    else if (key === 'price_max') { if (parseInt(row.Price) > parseInt(filterValue)) return false; }
+                    else if (key === 'date_from') { if (row.Publishing_date < filterValue) return false; }
+                    else if (key === 'date_to') { if (row.Publishing_date > filterValue) return false; }
+                    else { if (rowValue.toString().toLowerCase().indexOf(filterValue) === -1) return false; }
+                }
+                return true;
+            });
+        }
+
+        function sortDataByColumn(data, column, order) {
+            if (!data || !data.length) return [];
+            return data.slice().sort((a, b) => { let aVal = a[column] !== undefined ? a[column] : '', bVal = b[column] !== undefined ? b[column] : ''; const aNum = parseFloat(aVal), bNum = parseFloat(bVal); if (!isNaN(aNum) && !isNaN(bNum)) return order === 'asc' ? aNum - bNum : bNum - aNum; const comparison = aVal.toString().localeCompare(bVal.toString(), 'ru'); return order === 'asc' ? comparison : -comparison; });
+        }
+
+        function createDropdown(rowId, rowName, actions) {
+            let buttonsHtml = actions.map(act => `<div class="dropdown-menu-item ${act.class}" onclick="${act.onclick}">${t(act.labelKey)}</div>`).join('');
+            return `<div class="dropdown" data-id="${rowId}" data-name="${(!rowName ? '' : rowName.replace(/[&<>]/g, function (m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }))}"> <button class="dropdown-btn" title="Действия">⋮</button> <div class="dropdown-menu"> ${buttonsHtml} </div> </div>`;
+        }
+
+        function attachDropdownEvents() {
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                const btn = dropdown.querySelector('.dropdown-btn');
+                if (btn && !btn.hasAttribute('data-listener')) {
+                    btn.setAttribute('data-listener', 'true');
+                    btn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        document.querySelectorAll('.dropdown.active').forEach(d => { if (d !== dropdown) d.classList.remove('active'); });
+                        dropdown.classList.toggle('active');
+                        if (dropdown.classList.contains('active')) {
+                            const btnRect = btn.getBoundingClientRect(), menu = dropdown.querySelector('.dropdown-menu');
+                            if (!menu) return;
+                            menu.style.visibility = 'hidden'; menu.style.display = 'block';
+                            const mw = menu.offsetWidth || 190, mh = menu.offsetHeight || 150;
+                            menu.style.display = ''; menu.style.visibility = '';
+                            let top = btnRect.top, left = btnRect.right + 8;
+                            if (left + mw > window.innerWidth) left = btnRect.left - mw - 8;
+                            if (top + mh > window.innerHeight) top = Math.max(10, window.innerHeight - mh - 10);
+                            menu.style.top = top + 'px'; menu.style.left = left + 'px';
+                        }
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('click', function (event) { const isBtn = event.target.closest('.dropdown-btn'), isMenu = event.target.closest('.dropdown-menu'); if (!isBtn && !isMenu) { document.querySelectorAll('.dropdown.active').forEach(d => d.classList.remove('active')); } });
+        
+        window.addEventListener('scroll', function () { document.querySelectorAll('.dropdown.active').forEach(d => d.classList.remove('active')); if (currentEditingCell) cancelEdit(); }, true);
+        
+        window.addEventListener('resize', () => { document.querySelectorAll('.dropdown.active').forEach(dropdown => { const btn = dropdown.querySelector('.dropdown-btn'), menu = dropdown.querySelector('.dropdown-menu'); if (!btn || !menu) return; menu.style.visibility = 'hidden'; menu.style.display = 'block'; const mw = menu.offsetWidth || 190, mh = menu.offsetHeight || 150; menu.style.display = ''; menu.style.visibility = ''; let top = btn.getBoundingClientRect().top, left = btn.getBoundingClientRect().right + 8; if (left + mw > window.innerWidth) left = btn.getBoundingClientRect().left - mw - 8; if (top + mh > window.innerHeight) top = Math.max(10, window.innerHeight - mh - 10); menu.style.top = top + 'px'; menu.style.left = left + 'px'; }); if (currentEditingCell) cancelEdit(); });
+        async function loadData() {
+            const filters = JSON.parse(JSON.stringify(currentFilters)); filters.page = currentPage; filters.page_size = 50;
+            for (let k in filters) { if (filters[k] === null || filters[k] === '') delete filters[k]; }
+            try {
+                const resp = await fetchWithTime(API_BASE + '/data/filter', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(filters) });
+                if (resp.ok) {
+                    const data = await resp.json(); publishedData = data.data; const tbody = document.getElementById('tableBody');
+                    if (!data.data || !data.data.length) { tbody.innerHTML = `<tr><td colspan="14" class="text-center">${t('noData')}</td></tr>`; }
+                    else {
+                        let html = '';
+                        for (let i = 0; i < data.data.length; i++) {
+                            const row = data.data[i], actions = [
+                                { class: 'move', labelKey: 'actionDraft', onclick: `moveRow(${row.id}, 'pub')` },
+                                { class: 'negotiate', labelKey: 'actionNegotiate', onclick: `startNegotiation(${row.id})` },
+                                { class: 'delete', labelKey: 'actionDelete', onclick: `deleteRow(${row.id})` }
+                            ];
+                            const dropdown = createDropdown(row.id, row.NAME || '', actions);
+                            html += `<tr><td>${row.id}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Code')">${(!row.Code ? '' : row.Code.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'QTY')">${row.QTY || 0}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'NAME')">${(!row.NAME ? '' : row.NAME.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Brand')">${(!row.Brand ? '' : row.Brand.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Model')">${(!row.Model ? '' : row.Model.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'PLACE')">${(!row.PLACE ? '' : row.PLACE.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Price')">${row.Price || 0}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Conditions')">${(!row.Conditions ? '' : row.Conditions.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Truck_models')">${(!row.Truck_models ? '' : row.Truck_models.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Publishing_date')">${(!row.Publishing_date ? '' : row.Publishing_date.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Description')">${(!row.Description ? '' : row.Description.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="photo-cell" onclick="triggerPhotoUpload(${row.id})">${row.Photos ? 'Изменить' : 'Добавить'}</td><td style="text-align: center;">${dropdown}</td></tr>`;
+                        }
+                        tbody.innerHTML = html; attachDropdownEvents();
+                    }
+                    totalPages = data.total_pages;
+                    const div = document.getElementById('pagination');
+                    if (totalPages <= 1) { div.innerHTML = ''; } else {
+                        let html = '';
+                        if (currentPage > 1) html += '<button onclick="currentPage=' + (currentPage - 1) + '; loadData();">‹</button>';
+                        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="currentPage=' + i + '; loadData();">' + i + '</button>';
+                        if (currentPage < totalPages) html += '<button onclick="currentPage=' + (currentPage + 1) + '; loadData();">›</button>';
+                        div.innerHTML = html;
+                    }
+                } else { showAlert(t('errorLoad'), 'error'); }
+            } catch (e) { showAlert(t('errorConnection'), 'error'); }
+        }
+
+        async function loadUnpublished() { try { const resp = await fetchWithTime(API_BASE + '/admin/table/5', { headers: { 'Authorization': 'Bearer ' + token } }); if (resp.ok) { const data = await resp.json(); unpublishedData = data.data; filterAndRenderUnpublished(); } } catch (e) { } }
+        async function loadBufferSales() { try { const resp = await fetchWithTime(API_BASE + '/admin/table/buffer-sales', { headers: { 'Authorization': 'Bearer ' + token } }); if (resp.ok) { const data = await resp.json(); bufferData = data.data; filterAndRenderBuffer(); } } catch (e) { } }
+        async function loadSalesHistory() { try { const resp = await fetchWithTime(API_BASE + '/admin/table/sales-history', { headers: { 'Authorization': 'Bearer ' + token } }); if (resp.ok) { const data = await resp.json(); historyData = data.data; filterAndRenderHistory(); } } catch (e) { } }
+        function filterAndRenderUnpublished() {
+            const filtered = filterDataByFilters(unpublishedData, currentFilters), sorted = sortDataByColumn(filtered, sortState.unpublished.column, sortState.unpublished.order); const tbody = document.getElementById('unpublishedBody');
+            if (!sorted || !sorted.length) { tbody.innerHTML = `<tr><td colspan="14" class="text-center">${t('noData')}</td></tr>`; return; }
+            let html = '';
+            for (let i = 0; i < sorted.length; i++) {
+                const row = sorted[i], actions = [{ class: 'move', labelKey: 'actionPublish', onclick: `moveRow(${row.id}, 'unpub')` }, { class: 'delete', labelKey: 'actionDelete', onclick: `deleteRow(${row.id})` }];
+                const dropdown = createDropdown(row.id, row.NAME || '', actions);
+                html += `<tr><td>${row.id}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Code')">${(!row.Code ? '' : row.Code.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'QTY')">${row.QTY || 0}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'NAME')">${(!row.NAME ? '' : row.NAME.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Brand')">${(!row.Brand ? '' : row.Brand.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Model')">${(!row.Model ? '' : row.Model.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'PLACE')">${(!row.PLACE ? '' : row.PLACE.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Price')">${row.Price || 0}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Conditions')">${(!row.Conditions ? '' : row.Conditions.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Truck_models')">${(!row.Truck_models ? '' : row.Truck_models.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Publishing_date')">${(!row.Publishing_date ? '' : row.Publishing_date.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Description')">${(!row.Description ? '' : row.Description.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}</td><td class="photo-cell" onclick="triggerPhotoUpload(${row.id})">${row.Photos ? 'Изменить' : 'Добавить'}</td><td style="text-align: center;">${dropdown}</td></tr>`;
+            }
+            tbody.innerHTML = html; attachDropdownEvents();
+        }
+
+        function filterAndRenderBuffer() {
+            const filtered = filterDataByFilters(bufferData, currentFilters), sorted = sortDataByColumn(filtered, sortState.buffer.column, sortState.buffer.order); const tbody = document.getElementById('bufferBody');
+            if (!sorted || !sorted.length) { tbody.innerHTML = `<tr><td colspan="8" class="text-center">${t('noBuffer')}</td></tr>`; return; }
+            let html = '';
+            for (let i = 0; i < sorted.length; i++) {
+                const row = sorted[i], actions = [{ class: 'negotiate', labelKey: 'actionComplete', onclick: `endNegotiation(${row.id})` }, { class: 'delete', labelKey: 'actionCancel', onclick: `cancelNegotiation(${row.id})` }];
+                const dropdown = createDropdown(row.id, row.NAME || '', actions);
+                html += `<tr><td>${row.id}</td><td>${(!row.Code ? '' : row.Code.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td><td>${row.QTY || 0}<\/td><td>${(!row.NAME ? '' : row.NAME.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td><td>${row.Price || 0}<\/td><td>${row.sales_negotiation_start_date ? new Date(row.sales_negotiation_start_date).toLocaleString() : ''}<\/td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Description')">${(!row.Description ? '' : row.Description.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td><td style="text-align: center;">${dropdown}<\/td></tr>`;
+            }
+            tbody.innerHTML = html; attachDropdownEvents();
+        }
+
+        function filterAndRenderHistory() {
+            const filtered = filterDataByFilters(historyData, currentFilters), sorted = sortDataByColumn(filtered, sortState.history.column, sortState.history.order); const tbody = document.getElementById('historyBody');
+            if (!sorted || !sorted.length) { tbody.innerHTML = `<tr><td colspan="8" class="text-center">${t('noHistory')}</td></tr>`; return; }
+            let html = '';
+            for (let i = 0; i < sorted.length; i++) {
+                const row = sorted[i];
+                html += `<tr><td class="log-data-cell">${row.id}<\/td><td>${(!row.Code ? '' : row.Code.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td><td>${row.QTY || 0}<\/td><td>${(!row.NAME ? '' : row.NAME.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td><td>${row.Price || 0}<\/td><td>${row.sales_negotiation_start_date ? new Date(row.sales_negotiation_start_date).toLocaleString() : ''}<\/td><td>${row.sales_negotiation_end_date ? new Date(row.sales_negotiation_end_date).toLocaleString() : ''}<\/td><td class="editable-cell" onclick="openEdit(this, ${row.id}, 'Description')">${(!row.Description ? '' : row.Description.replace(/[&<>]/g, m => (m === '&' ? '&amp;' : m === '<' ? '&lt;' : m === '>' ? '&gt;' : m)))}<\/td></tr>`;
+            }
+            tbody.innerHTML = html;
+        }
+        async function addNewItem() {
+            let qtyVal = document.getElementById('modalNewQty').value; qtyVal = (qtyVal === '' || parseInt(qtyVal) < 1) ? 1 : parseInt(qtyVal);
+            const newItem = { code: document.getElementById('modalNewCode').value, qty: qtyVal, name: document.getElementById('modalNewName').value, brand: document.getElementById('modalNewBrand').value, model: document.getElementById('modalNewModel').value, place: document.getElementById('modalNewPlace').value, price: parseInt(document.getElementById('modalNewPrice').value) || 0, conditions: document.getElementById('modalNewCondition').value, truck_models: document.getElementById('modalNewTruckModels').value, description: document.getElementById('modalNewDescription').value, publishing_date: new Date().toISOString().split('T')[0] };
+            if (!newItem.code || !newItem.name) { showAlert(t('errorAdd'), 'error'); return; }
+            try {
+                const resp = await fetchWithTime(API_BASE + '/admin/table/unpublished/add', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(newItem) });
+                if (resp.ok) { showAlert(t('successAdd'), 'success'); document.getElementById('addItemModal').classList.remove('active'); document.getElementById('modalNewCode').value = ''; document.getElementById('modalNewQty').value = '1'; document.getElementById('modalNewName').value = ''; document.getElementById('modalNewBrand').value = ''; document.getElementById('modalNewModel').value = ''; document.getElementById('modalNewPlace').value = ''; document.getElementById('modalNewPrice').value = '0'; document.getElementById('modalNewCondition').value = ''; document.getElementById('modalNewTruckModels').value = ''; document.getElementById('modalNewDescription').value = ''; await loadData(); await loadUnpublished(); }
+                else { showAlert(t('errorLoad'), 'error'); }
+            } catch (e) { showAlert(t('errorConnection'), 'error'); }
+        }
+        async function deleteRow(id) {
+            const row = document.querySelector(`.dropdown[data-id="${id}"]`), tr = row ? row.closest('tr') : null, rowName = row ? row.getAttribute('data-name') : 'товар';
+            showConfirmModal(t('confirmTitle'), `${t('deleteConfirmMsg')} "${rowName}" (ID: ${id})?`, async () => {
+                if (tr) tr.style.display = 'none';
+                redoBuffer = { hasRedo: false };
+                undoBuffer = { hasUndo: true, actionType: 'delete', rowId: id, trNode: tr };
+                document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                let ind = document.createElement('div'); ind.className = 'undo-indicator'; ind.innerHTML = 'Ctrl+Z для відкату'; document.body.appendChild(ind); setTimeout(() => ind.remove(), 3000);
+                const timeoutId = setTimeout(async () => {
+                    try {
+                        const resp = await fetchWithTime(API_BASE + '/admin/table/delete-row', { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: id }) });
+                        if (resp.ok) { pendingDeletions.delete(id); }
+                        else { }
+                    } catch (e) { }
+                }, 10000);
+                pendingDeletions.set(id, timeoutId);
+                showAlert(t('successDelete'), 'info');
+            });
+        }
+
+        async function moveRow(id, source) {
+            const row = document.querySelector(`.dropdown[data-id="${id}"]`), rowName = row ? row.getAttribute('data-name') : 'товар', targetText = source === 'pub' ? t('moveTargetUnpub') : t('moveTargetPub');
+            showConfirmModal(t('confirmTitle'), `${t('moveConfirmMsg')} "${rowName}" (ID: ${id}) ${t('moveTargetPub')}?`, async () => {
+                try {
+                    const resp = await fetchWithTime(API_BASE + '/admin/move-row', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ source: source, id: id }) });
+                    if (resp.ok) {
+                        showAlert(t('successMove'), 'success');
+                        redoBuffer = { hasRedo: false };
+                        undoBuffer = { hasUndo: true, actionType: 'move', rowId: id, source: source };
+                        document.querySelectorAll('.undo-indicator').forEach(el => el.remove());
+                        let ind = document.createElement('div'); ind.className = 'undo-indicator'; ind.innerHTML = 'Ctrl+Z для відкату'; document.body.appendChild(ind); setTimeout(() => ind.remove(), 3000);
+                        await loadData(); await loadUnpublished();
+                    } else { showAlert(t('errorLoad'), 'error'); }
+                } catch (e) { showAlert(t('errorConnection'), 'error'); }
+            });
+        }
+
+        function startNegotiation(id) { negotiateRecordId = id; document.getElementById('negotiateQty').value = '1'; document.getElementById('negotiateModal').classList.add('active'); }
+
+        async function confirmNegotiation() {
+            const qty = document.getElementById('negotiateQty').value;
+            if (!qty || isNaN(qty) || parseInt(qty) <= 0) { showAlert(t('errorInvalidQty'), 'error'); return; }
+            try {
+                const resp = await fetchWithTime(API_BASE + '/admin/start-negotiation', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: negotiateRecordId, sold_qty: parseInt(qty) }) });
+                if (resp.ok) { showAlert(t('successNegotiationStart'), 'success'); document.getElementById('negotiateModal').classList.remove('active'); negotiateRecordId = null; await loadData(); await loadBufferSales(); }
+                else { showAlert(t('errorLoad'), 'error'); }
+            } catch (e) { showAlert(t('errorConnection'), 'error'); }
+        }
+
+        async function endNegotiation(id) {
+            const row = document.querySelector(`.dropdown[data-id="${id}"]`), rowName = row ? row.getAttribute('data-name') : 'товар';
+            showConfirmModal(t('confirmTitle'), `${t('endNegotiateConfirm')} "${rowName}" (ID: ${id})?`, async () => {
+                try {
+                    const resp = await fetchWithTime(API_BASE + '/admin/end-negotiation', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: id }) });
+                    if (resp.ok) { showAlert(t('successNegotiationEnd'), 'success'); await loadBufferSales(); await loadSalesHistory(); }
+                    else { showAlert(t('errorLoad'), 'error'); }
+                } catch (e) { showAlert(t('errorConnection'), 'error'); }
+            });
+        }
+
+        async function cancelNegotiation(id) {
+            const row = document.querySelector(`.dropdown[data-id="${id}"]`), rowName = row ? row.getAttribute('data-name') : 'товар';
+            showConfirmModal(t('confirmTitle'), `${t('cancelNegotiateConfirm')} "${rowName}"?`, async () => {
+                try {
+                    const resp = await fetchWithTime(API_BASE + '/admin/cancel-negotiation', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ record_id: id }) });
+                    if (resp.ok) { showAlert(t('successCancel'), 'success'); await loadBufferSales(); await loadUnpublished(); }
+                    else { showAlert(t('errorLoad'), 'error'); }
+                } catch (e) { showAlert(t('errorConnection'), 'error'); }
+            });
+        }
+
+        function applyFilters() {
+            currentFilters = { code: document.getElementById('filterCode').value || null, name: document.getElementById('filterName').value || null, brand: document.getElementById('filterBrand').value || null, model: document.getElementById('filterModel').value || null, place: document.getElementById('filterPlace').value || null, qty_min: document.getElementById('filterQtyMin').value ? parseInt(document.getElementById('filterQtyMin').value) : null, qty_max: document.getElementById('filterQtyMax').value ? parseInt(document.getElementById('filterQtyMax').value) : null, price_min: document.getElementById('filterPriceMin').value ? parseInt(document.getElementById('filterPriceMin').value) : null, price_max: document.getElementById('filterPriceMax').value ? parseInt(document.getElementById('filterPriceMax').value) : null, condition: document.getElementById('filterCondition').value || null, date_from: document.getElementById('filterDateFrom').value || null, date_to: document.getElementById('filterDateTo').value || null, sort_by: sortState.published.column, sort_order: sortState.published.order };
+            currentPage = 1; loadData(); filterAndRenderUnpublished(); filterAndRenderBuffer(); filterAndRenderHistory();
+        }
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>
