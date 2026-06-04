@@ -52,6 +52,8 @@ class LogCapture:
 
 logger = LogCapture()
 
+LOG_FILE_PATH = "logs/app.log"
+
 class ConfigReader:
     _instance = None
     _config = {}
