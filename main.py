@@ -24,6 +24,7 @@ import time
 from collections import defaultdict
 import hmac
 from typing import Optional
+
 UPLOAD_DIR = config.get('UPLOAD_DIR')
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 PHOTOS_DIR = os.path.join(os.path.dirname(__file__), "Photos")
