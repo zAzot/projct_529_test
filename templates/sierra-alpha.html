@@ -47,6 +47,7 @@
             font-size: 16px;
             line-height: 1.4;
             min-height: 100vh;
+            caret-color: transparent !important;
         }
 
         .container {
@@ -67,10 +68,97 @@
             border: 1px solid var(--border-color-gray);
         }
 
-            .header h1 {
-                font-size: 22px;
-                font-weight: 600;
-                color: var(--text-color-base);
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .language-switcher {
+            position: relative;
+            display: inline-block;
+        }
+
+        .lang-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            font-size: 15px;
+            font-weight: 600;
+            border: 1px solid var(--border-color-gray);
+            border-radius: 4px;
+            cursor: pointer;
+            background: var(--panel-background);
+            color: var(--text-color-base);
+            transition: all 0.2s ease;
+        }
+
+            .lang-toggle:hover {
+                background: var(--hover-item-background);
+            }
+
+            .lang-toggle::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s ease;
+            }
+
+        .language-switcher.open .lang-toggle::after {
+            transform: rotate(180deg);
+        }
+
+        .lang-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background: var(--panel-background);
+            border: 1px solid var(--border-color-gray);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            min-width: 100px;
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .language-switcher.open .lang-menu {
+            display: flex;
+        }
+
+        .lang-option {
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            background: transparent;
+            color: var(--text-color-base);
+            cursor: pointer;
+            text-align: left;
+            width: 100%;
+            transition: background 0.2s ease;
+        }
+
+            .lang-option:hover {
+                background: var(--hover-item-background);
+            }
+
+            .lang-option.active {
+                background: var(--btn-black-background);
+                color: #fff;
             }
 
         .btn {
@@ -396,57 +484,72 @@
             justify-content: center;
             margin-top: 20px;
         }
+
+        input, textarea {
+            caret-color: auto !important;
+        }
     </style>
 </head>
 <body>
     <div class="container" id="mainWrapper" style="display: none;">
         <div class="header">
-            <h1>Системное управление сервером</h1>
-            <div>
-                <button class="btn btn--graphite" onclick="localStorage.removeItem('adminToken'); window.location.href = '/login';">Выйти</button>
+            <div class="header-left">
+                <img id="headerLogo" class="header-logo" src="" alt="Logo" style="display: none;">
+            </div>
+            <div class="header-right">
+                <div class="language-switcher" id="languageSwitcher">
+                    <button class="lang-toggle" id="langToggle">RU</button>
+                    <div class="lang-menu" id="langMenu">
+                        <button class="lang-option active" data-lang="ru">RU</button>
+                        <button class="lang-option" data-lang="en">EN</button>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn--graphite" onclick="localStorage.removeItem('adminToken'); window.location.href = '/login';">Выйти</button>
+                </div>
             </div>
         </div>
         <div class="nav-tabs">
-            <button class="nav-tab active" data-tab="backupTab">Резервные копии (БД)</button>
-            <button class="nav-tab" data-tab="adminsTab">Управление доступом</button>
-            <button class="nav-tab" data-tab="logsTab">Логи</button>
-            <button class="nav-tab" data-tab="contactsTab">Контакты продавца</button>
+            <button class="nav-tab active" data-tab="backupTab" data-i18n="backupTab">Резервные копии (БД)</button>
+            <button class="nav-tab" data-tab="adminsTab" data-i18n="adminsTab">Управление доступом</button>
+            <button class="nav-tab" data-tab="logsTab" data-i18n="logsTab">Логи</button>
+            <button class="nav-tab" data-tab="contactsTab" data-i18n="contactsTab">Контакты продавца</button>
         </div>
 
         <div id="backupTab" class="tab-content active">
             <div class="cards-grid">
                 <div class="action-card">
-                    <h3>Создание ручной копии</h3>
-                    <p>Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.</p>
-                    <button class="btn btn--success full-width" onclick="createManualBackup()">Создать бэкап</button>
+                    <h3 data-i18n="manualBackupTitle">Создание ручной копии</h3>
+                    <p data-i18n="manualBackupDesc">Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.</p>
+                    <button class="btn btn--success full-width" onclick="createManualBackup()" data-i18n="createBackupBtn">Создать бэкап</button>
                 </div>
                 <div class="action-card">
-                    <h3>Восстановление (Ручная копия)</h3>
-                    <p>Восстановить данные из таблицы manual_backup.</p>
+                    <h3 data-i18n="restoreManualTitle">Восстановление (Ручная копия)</h3>
+                    <p data-i18n="restoreManualDesc">Восстановить данные из таблицы manual_backup.</p>
                     <div class="form-group">
-                        <label>Таблицы для восстановления</label>
+                        <label data-i18n="restoreTablesLabel">Таблицы для восстановления</label>
                         <select id="restoreManualTables">
-                            <option value="all">Все (pub, unpub, buffer)</option>
-                            <option value="tbl_1_pub">Только tbl_1_pub</option>
-                            <option value="tbl_2_unpub">Только tbl_2_unpub</option>
-                            <option value="tbl_3_buffer">Только tbl_3_buffer</option>
+                            <option value="all" data-i18n="allTablesOption">Все (pub, unpub, buffer)</option>
+                            <option value="tbl_1_pub" data-i18n="onlyPubOption">Только tbl_1_pub</option>
+                            <option value="tbl_2_unpub" data-i18n="onlyUnpubOption">Только tbl_2_unpub</option>
+                            <option value="tbl_3_buffer" data-i18n="onlyBufferOption">Только tbl_3_buffer</option>
                         </select>
                     </div>
-                    <button class="btn btn--black full-width" onclick="restoreManualBackup()">Восстановить данные</button>
+                    <button class="btn btn--black full-width" onclick="restoreManualBackup()" data-i18n="restoreBtn">Восстановить данные</button>
                 </div>
                 <div class="action-card">
-                    <h3>Восстановление (Авто-копия)</h3>
-                    <p>Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.</p>
+                    <h3 data-i18n="restoreAutoTitle">Восстановление (Авто-копия)</h3>
+                    <p data-i18n="restoreAutoDesc">Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.</p>
                     <div class="form-group">
-                        <label>Таблицы для восстановления</label>
+                        <label data-i18n="restoreTablesLabel">Таблицы для восстановления</label>
                         <select id="restoreAutoTables">
-                            <option value="all">Все (pub, unpub, buffer)</option>
-                            <option value="tbl_1_pub">Только tbl_1_pub</option>
-                            <option value="tbl_2_unpub">Только tbl_2_unpub</option>
-                            <option value="tbl_3_buffer">Только tbl_3_buffer</option>
+                            <option value="all" data-i18n="allTablesOption">Все (pub, unpub, buffer)</option>
+                            <option value="tbl_1_pub" data-i18n="onlyPubOption">Только tbl_1_pub</option>
+                            <option value="tbl_2_unpub" data-i18n="onlyUnpubOption">Только tbl_2_unpub</option>
+                            <option value="tbl_3_buffer" data-i18n="onlyBufferOption">Только tbl_3_buffer</option>
                         </select>
                     </div>
-                    <button class="btn btn--black full-width" onclick="restoreAutoBackup()">Восстановить данные</button>
+                    <button class="btn btn--black full-width" onclick="restoreAutoBackup()" data-i18n="restoreBtn">Восстановить данные</button>
                 </div>
             </div>
         </div>
@@ -454,16 +557,16 @@
         <div id="adminsTab" class="tab-content">
             <div class="table-container">
                 <div class="table-header-actions">
-                    <h3>Список администраторов</h3>
-                    <button class="btn btn--black btn--small" onclick="showAddAdminModal()">+ Добавить нового администратора</button>
+                    <h3 data-i18n="adminsListTitle">Список администраторов</h3>
+                    <button class="btn btn--black btn--small" onclick="showAddAdminModal()" data-i18n="addAdminBtn">+ Добавить нового администратора</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
-                            <tr><th>Логин</th><th>Почта</th><th>Пароль</th><th>Действие</th></tr>
+                            <tr><th data-i18n="loginCol">Логин</th><th data-i18n="emailCol">Почта</th><th data-i18n="passwordCol">Пароль</th><th data-i18n="actionCol">Действие</th></tr>
                         </thead>
                         <tbody id="adminsTableBody">
-                            <tr><td colspan="4" class="text-center">Загрузка</td></tr>
+                            <tr><td colspan="4" class="text-center" data-i18n="loading">Загрузка</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -473,16 +576,16 @@
         <div id="logsTab" class="tab-content">
             <div class="table-container">
                 <div class="table-header-actions">
-                    <h3>Логи администраторов</h3>
-                    <button class="btn btn--black btn--small" onclick="loadLogs()">Обновить</button>
+                    <h3 data-i18n="logsTitle">Логи администраторов</h3>
+                    <button class="btn btn--black btn--small" onclick="loadLogs()" data-i18n="refreshBtn">Обновить</button>
                 </div>
                 <div style="overflow-x: auto;">
                     <table>
                         <thead>
-                            <tr><th>ID</th><th>Логин</th><th>Эндпоинт</th><th>Request Data</th><th>Response Data</th><th>Время создания</th></tr>
+                            <tr><th>ID</th><th data-i18n="loginCol">Логин</th><th data-i18n="endpointCol">Эндпоинт</th><th data-i18n="requestDataCol">Request Data</th><th data-i18n="responseDataCol">Response Data</th><th data-i18n="createdAtCol">Время создания</th></tr>
                         </thead>
                         <tbody id="logsTableBody">
-                            <tr><td colspan="6" class="text-center">Загрузка</td></tr>
+                            <tr><td colspan="6" class="text-center" data-i18n="loading">Загрузка</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -492,17 +595,17 @@
         <div id="contactsTab" class="tab-content">
             <div class="cards-grid">
                 <div class="action-card">
-                    <h3>Управление контактами продавца</h3>
-                    <p>Эти контактные данные будут отображаться для пользователей на сайте.</p>
+                    <h3 data-i18n="contactsTitle">Управление контактами продавца</h3>
+                    <p data-i18n="contactsDesc">Эти контактные данные будут отображаться для пользователей на сайте.</p>
                     <div class="form-group">
-                        <label>Номер телефона</label>
+                        <label data-i18n="phoneLabel">Номер телефона</label>
                         <input type="text" id="contactPhone" placeholder="Например: +380991234567">
                     </div>
                     <div class="form-group">
-                        <label>Имя продавца</label>
+                        <label data-i18n="nameLabel">Имя продавца</label>
                         <input type="text" id="contactName" placeholder="Например: Александр">
                     </div>
-                    <button class="btn btn--success full-width" onclick="confirmUpdateContacts()">Сохранить контакты</button>
+                    <button class="btn btn--success full-width" onclick="confirmUpdateContacts()" data-i18n="saveContactsBtn">Сохранить контакты</button>
                 </div>
             </div>
         </div>
@@ -511,41 +614,240 @@
 
     <div id="confirmModal" class="modal">
         <div class="modal-content">
-            <h3 id="modalTitle" style="text-align: center;">Подтверждение</h3>
-            <p id="modalMessage">Вы уверены?</p>
+            <h3 id="modalTitle" style="text-align: center;" data-i18n="confirmTitle">Подтверждение</h3>
+            <p id="modalMessage" data-i18n="confirmMessage">Вы уверены?</p>
             <div class="modal-buttons">
-                <button class="btn btn--cancel" onclick="document.getElementById('confirmModal').classList.remove('active'); confirmActionCallback = null;">Отмена</button>
-                <button class="btn btn--danger" id="modalConfirmBtn">Подтвердить</button>
+                <button class="btn btn--cancel" onclick="document.getElementById('confirmModal').classList.remove('active'); confirmActionCallback = null;" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--danger" id="modalConfirmBtn" data-i18n="confirmBtn">Подтвердить</button>
             </div>
         </div>
     </div>
     <div id="addAdminModal" class="modal">
         <div class="modal-content">
-            <h3 style="text-align: center;">Добавить нового администратора</h3>
+            <h3 style="text-align: center;" data-i18n="addAdminTitle">Добавить нового администратора</h3>
             <div class="form-group">
-                <label>Логин (Username)</label>
+                <label data-i18n="usernameLabel">Логин (Username)</label>
                 <input type="text" id="regUsername" placeholder="Только буквы и цифры">
             </div>
             <div class="form-group">
-                <label>Email (необязательно)</label>
+                <label data-i18n="emailLabel">Email (необязательно)</label>
                 <input type="email" id="regEmail" placeholder="admin@example.com">
             </div>
             <div class="form-group">
-                <label>Пароль</label>
+                <label data-i18n="passwordLabel">Пароль</label>
                 <div style="display: flex; gap: 8px;">
-                    <button type="button" id="generatePwdBtn" class="btn btn--info" style="display: none; padding: 0 12px; font-size: 13px;" title="Сгенерировать случайный пароль">Сгенерировать</button>
+                    <button type="button" id="generatePwdBtn" class="btn btn--info" style="display: none; padding: 0 12px; font-size: 13px;" title="Сгенерировать случайный пароль" data-i18n="generateBtn">Сгенерировать</button>
                     <input type="password" id="regPassword" placeholder="Минимум 6 символов" style="flex: 1;">
                 </div>
             </div>
             <div class="modal-buttons">
-                <button class="btn btn--cancel" onclick="document.getElementById('addAdminModal').classList.remove('active');">Отмена</button>
-                <button class="btn btn--success" onclick="registerAdmin()">Добавить</button>
+                <button class="btn btn--cancel" onclick="document.getElementById('addAdminModal').classList.remove('active');" data-i18n="cancelBtn">Отмена</button>
+                <button class="btn btn--success" onclick="registerAdmin()" data-i18n="addBtn">Добавить</button>
             </div>
         </div>
     </div>
 
     <script>
+        const translations = {
+            ru: {
+                backupTab: 'Резервные копии (БД)',
+                adminsTab: 'Управление доступом',
+                logsTab: 'Логи',
+                contactsTab: 'Контакты продавца',
+                manualBackupTitle: 'Создание ручной копии',
+                manualBackupDesc: 'Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.',
+                createBackupBtn: 'Создать бэкап',
+                restoreManualTitle: 'Восстановление (Ручная копия)',
+                restoreManualDesc: 'Восстановить данные из таблицы manual_backup.',
+                restoreTablesLabel: 'Таблицы для восстановления',
+                allTablesOption: 'Все (pub, unpub, buffer)',
+                onlyPubOption: 'Только tbl_1_pub',
+                onlyUnpubOption: 'Только tbl_2_unpub',
+                onlyBufferOption: 'Только tbl_3_buffer',
+                restoreBtn: 'Восстановить данные',
+                restoreAutoTitle: 'Восстановление (Авто-копия)',
+                restoreAutoDesc: 'Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.',
+                adminsListTitle: 'Список администраторов',
+                addAdminBtn: '+ Добавить нового администратора',
+                loginCol: 'Логин',
+                emailCol: 'Почта',
+                passwordCol: 'Пароль',
+                actionCol: 'Действие',
+                logsTitle: 'Логи администраторов',
+                refreshBtn: 'Обновить',
+                endpointCol: 'Эндпоинт',
+                requestDataCol: 'Request Data',
+                responseDataCol: 'Response Data',
+                createdAtCol: 'Время создания',
+                contactsTitle: 'Управление контактами продавца',
+                contactsDesc: 'Эти контактные данные будут отображаться для пользователей на сайте.',
+                phoneLabel: 'Номер телефона',
+                nameLabel: 'Имя продавца',
+                saveContactsBtn: 'Сохранить контакты',
+                confirmTitle: 'Подтверждение',
+                confirmMessage: 'Вы уверены?',
+                cancelBtn: 'Отмена',
+                confirmBtn: 'Подтвердить',
+                addAdminTitle: 'Добавить нового администратора',
+                usernameLabel: 'Логин (Username)',
+                emailLabel: 'Email (необязательно)',
+                passwordLabel: 'Пароль',
+                generateBtn: 'Сгенерировать',
+                addBtn: 'Добавить',
+                loading: 'Загрузка',
+                deleteAdminConfirm: 'Вы уверены, что хотите удалить администратора',
+                updateContactsConfirm: 'Вы уверены, что хотите сохранить новые контактные данные?',
+                createBackupConfirm: 'Вы уверены, что хотите перезаписать текущий ручной бэкап новыми данными?',
+                restoreManualConfirm: 'Вы уверены, что хотите перезаписать текущие данные данными из ручного бэкапа?',
+                restoreAutoConfirm: 'Эта копия была создана перед последней загрузкой файла. Перезаписать текущие данные?',
+                successContactsUpdated: 'Контактные данные успешно обновлены',
+                successBackupCreated: 'Ручная копия успешно создана',
+                successRestoreManual: 'Восстановление из ручной копии завершено',
+                successRestoreAuto: 'Восстановление из авто-копии завершено',
+                successAdminCreated: 'Администратор успешно создан',
+                successAdminDeleted: 'Администратор удален',
+                errorAuth: 'Ошибка авторизации',
+                errorLoadAdmins: 'Не удалось загрузить список',
+                errorLoadLogs: 'Не удалось загрузить логи',
+                errorRequest: 'Ошибка выполнения запроса',
+                errorConnection: 'Ошибка подключения',
+                errorRequiredFields: 'Заполните обязательные поля (Логин и Пароль)'
+            },
+            en: {
+                backupTab: 'Backups (DB)',
+                adminsTab: 'Access Management',
+                logsTab: 'Logs',
+                contactsTab: 'Seller Contacts',
+                manualBackupTitle: 'Create Manual Backup',
+                manualBackupDesc: 'Copy current data from tables (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) to manual backup.',
+                createBackupBtn: 'Create Backup',
+                restoreManualTitle: 'Restore (Manual Backup)',
+                restoreManualDesc: 'Restore data from manual_backup table.',
+                restoreTablesLabel: 'Tables to restore',
+                allTablesOption: 'All (pub, unpub, buffer)',
+                onlyPubOption: 'Only tbl_1_pub',
+                onlyUnpubOption: 'Only tbl_2_unpub',
+                onlyBufferOption: 'Only tbl_3_buffer',
+                restoreBtn: 'Restore Data',
+                restoreAutoTitle: 'Restore (Auto Backup)',
+                restoreAutoDesc: 'Restore data from automatic backup (backup_table) created during last file upload.',
+                adminsListTitle: 'Administrators List',
+                addAdminBtn: '+ Add New Administrator',
+                loginCol: 'Login',
+                emailCol: 'Email',
+                passwordCol: 'Password',
+                actionCol: 'Action',
+                logsTitle: 'Admin Logs',
+                refreshBtn: 'Refresh',
+                endpointCol: 'Endpoint',
+                requestDataCol: 'Request Data',
+                responseDataCol: 'Response Data',
+                createdAtCol: 'Created At',
+                contactsTitle: 'Manage Seller Contacts',
+                contactsDesc: 'These contact details will be displayed to users on the website.',
+                phoneLabel: 'Phone Number',
+                nameLabel: 'Seller Name',
+                saveContactsBtn: 'Save Contacts',
+                confirmTitle: 'Confirmation',
+                confirmMessage: 'Are you sure?',
+                cancelBtn: 'Cancel',
+                confirmBtn: 'Confirm',
+                addAdminTitle: 'Add New Administrator',
+                usernameLabel: 'Username',
+                emailLabel: 'Email (optional)',
+                passwordLabel: 'Password',
+                generateBtn: 'Generate',
+                addBtn: 'Add',
+                loading: 'Loading',
+                deleteAdminConfirm: 'Are you sure you want to delete the administrator',
+                updateContactsConfirm: 'Are you sure you want to save the new contact details?',
+                createBackupConfirm: 'Are you sure you want to overwrite the current manual backup with new data?',
+                restoreManualConfirm: 'Are you sure you want to overwrite current data with data from the manual backup?',
+                restoreAutoConfirm: 'This backup was created before the last file upload. Overwrite current data?',
+                successContactsUpdated: 'Contact details successfully updated',
+                successBackupCreated: 'Manual backup successfully created',
+                successRestoreManual: 'Restore from manual backup completed',
+                successRestoreAuto: 'Restore from auto backup completed',
+                successAdminCreated: 'Administrator successfully created',
+                successAdminDeleted: 'Administrator deleted',
+                errorAuth: 'Authorization error',
+                errorLoadAdmins: 'Failed to load list',
+                errorLoadLogs: 'Failed to load logs',
+                errorRequest: 'Request execution error',
+                errorConnection: 'Connection error',
+                errorRequiredFields: 'Please fill in the required fields (Login and Password)'
+            }
+        };
+        let currentLang = localStorage.getItem('appLang') || 'ru';
+        function t(key) { return translations[currentLang] && translations[currentLang][key] !== undefined ? translations[currentLang][key] : key; }
+        function updateStaticTexts() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (key && translations[currentLang][key]) {
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
+                        if (el.placeholder !== undefined) el.placeholder = translations[currentLang][key];
+                        else el.textContent = translations[currentLang][key];
+                    } else if (el.tagName === 'OPTION') {
+                        el.textContent = translations[currentLang][key];
+                    } else {
+                        el.textContent = translations[currentLang][key];
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+            const toggleBtn = document.getElementById('langToggle');
+            if (toggleBtn) toggleBtn.textContent = currentLang.toUpperCase();
+        }
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('appLang', lang);
+            updateStaticTexts();
+            loadAdmins();
+            loadLogs();
+        }
+        const switcher = document.getElementById('languageSwitcher');
+        const toggleBtn = document.getElementById('langToggle');
+        const menuOptions = document.querySelectorAll('.lang-option');
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switcher.classList.toggle('open');
+        });
+        document.addEventListener('click', (e) => {
+            if (!switcher.contains(e.target)) switcher.classList.remove('open');
+        });
+        menuOptions.forEach(btn => {
+            btn.onclick = () => {
+                setLanguage(btn.dataset.lang);
+                switcher.classList.remove('open');
+            };
+        });
+        updateStaticTexts();
+
         const API_BASE = window.location.origin;
+
+        (async function loadLogo() {
+            const logoImg = document.getElementById('headerLogo');
+            try {
+                const resp = await fetch(API_BASE + '/logo');
+                if (resp.ok) {
+                    const blob = await resp.blob();
+                    const url = URL.createObjectURL(blob);
+                    logoImg.src = url;
+                    logoImg.onload = () => {
+                        logoImg.style.display = 'block';
+                        URL.revokeObjectURL(url);
+                    };
+                    logoImg.onerror = () => {
+                        logoImg.style.display = 'none';
+                        URL.revokeObjectURL(url);
+                    };
+                } else {
+                    logoImg.style.display = 'none';
+                }
+            } catch (e) {
+                logoImg.style.display = 'none';
+            }
+        })();
 
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', function () {
@@ -565,7 +867,6 @@
                 if (!resp.ok) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
                 const data = await resp.json();
                 if (!data.valid) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
-
                 document.getElementById('mainWrapper').style.display = 'block';
                 loadAdmins();
                 loadLogs();
@@ -589,65 +890,53 @@
         function confirmUpdateContacts() {
             const phone = document.getElementById('contactPhone').value.trim();
             const name = document.getElementById('contactName').value.trim();
-
-            showModal('Обновление контактов', 'Вы уверены, что хотите сохранить новые контактные данные?', async () => {
+            showModal(t('confirmTitle'), t('updateContactsConfirm'), async () => {
                 const payload = { phone: phone, name: name };
-
                 try {
                     const res = await fetch(API_BASE + '/admin/contacts', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + token
-                        },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify(payload)
                     });
                     const data = await res.json();
-                    handleResponse(res, data, 'Контактные данные успешно обновлены');
-                } catch (e) {
-                    showAlert('Ошибка выполнения запроса', 'error');
-                }
+                    handleResponse(res, data, t('successContactsUpdated'));
+                } catch (e) { showAlert(t('errorRequest'), 'error'); }
             });
         }
 
         async function loadAdmins() {
             const tbody = document.getElementById('adminsTableBody');
             try {
-                const res = await fetch(`${API_BASE}/admin/admins-list`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const res = await fetch(`${API_BASE}/admin/admins-list`, { headers: { 'Authorization': 'Bearer ' + token } });
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.admins || data.admins.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
+                        tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
                     } else {
                         let html = '';
                         data.admins.forEach(admin => {
-                            html += `<tr><td>${admin.username}</td><td>${admin.email}</td><td>******</td><td><button class="btn btn--danger btn--small" onclick="confirmDeleteAdmin('${admin.email}')">Удалить</button></td></tr>`;
+                            html += `<tr><td>${admin.username}</td><td>${admin.email}</td><td>******</td><td><button class="btn btn--danger btn--small" onclick="confirmDeleteAdmin('${admin.email}')">${t('actionCol')}</button></td></tr>`;
                         });
                         tbody.innerHTML = html;
                     }
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
-                    showAlert('Не удалось загрузить список', 'error');
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
+                    showAlert(t('errorLoadAdmins'), 'error');
                 }
             } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center">БД пуста</td></tr>';
-                showAlert('Ошибка загрузки данных базы', 'error');
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
+                showAlert(t('errorConnection'), 'error');
             }
         }
 
         async function loadLogs() {
             const tbody = document.getElementById('logsTableBody');
             try {
-                const res = await fetch(`${API_BASE}/admin/logs`, {
-                    method: 'POST',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
+                const res = await fetch(`${API_BASE}/admin/logs`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
                 if (res.ok) {
                     const data = await res.json();
                     if (!data.logs || data.logs.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
+                        tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
                     } else {
                         let html = '';
                         data.logs.forEach(log => {
@@ -659,12 +948,12 @@
                         tbody.innerHTML = html;
                     }
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
-                    showAlert('Не удалось загрузить логи', 'error');
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
+                    showAlert(t('errorLoadLogs'), 'error');
                 }
             } catch (error) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center">БД пуста</td></tr>';
-                showAlert('Ошибка загрузки логов', 'error');
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
+                showAlert(t('errorConnection'), 'error');
             }
         }
 
@@ -702,70 +991,54 @@
             regPassword.value = generatedPassword;
             regPassword.type = 'text';
             toggleGenerateButton();
-            showAlert('Пароль сгенерирован! Сохраните его в надежном месте', 'info');
+            showAlert(t('generateBtn'), 'info');
         });
 
         async function registerAdmin() {
             const username = regUsername.value.trim();
             const password = regPassword.value;
             let email = regEmail.value.trim();
-
             if (!username || !password) {
-                return showAlert('Заполните обязательные поля (Логин и Пароль)', 'error');
+                return showAlert(t('errorRequiredFields'), 'error');
             }
             if (!email) {
                 email = `${username}@system.local`;
             }
-
-            const payload = {
-                username: username,
-                email: email,
-                password: password
-            };
-
+            const payload = { username: username, email: email, password: password };
             try {
                 const res = await fetch(API_BASE + '/admin/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    showAlert('Администратор успешно создан', 'success');
+                    showAlert(t('successAdminCreated'), 'success');
                     document.getElementById('addAdminModal').classList.remove('active');
                     loadAdmins();
                 } else {
-                    showAlert(data.detail || 'Ошибка регистрации', 'error');
+                    showAlert(data.detail || t('errorRequest'), 'error');
                 }
             } catch (e) {
-                showAlert('Ошибка подключения', 'error');
+                showAlert(t('errorConnection'), 'error');
             }
         }
 
         function createManualBackup() {
-            showModal('Создание ручной копии', 'Вы уверены, что хотите перезаписать текущий ручной бэкап новыми данными?', async () => {
+            showModal(t('confirmTitle'), t('createBackupConfirm'), async () => {
                 try {
-                    const res = await fetch(API_BASE + '/admin/backup/create', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token }
-                    });
+                    const res = await fetch(API_BASE + '/admin/backup/create', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
                     const data = await res.json();
-                    handleResponse(res, data, 'Ручная копия успешно создана');
-                } catch (e) {
-                    showAlert('Ошибка выполнения запроса', 'error');
-                }
+                    handleResponse(res, data, t('successBackupCreated'));
+                } catch (e) { showAlert(t('errorRequest'), 'error'); }
             });
         }
 
         async function restoreManualBackup() {
             const targetTables = document.getElementById('restoreManualTables').value;
-            showModal('Восстановление из ручной копии', 'Вы уверены, что хотите перезаписать текущие данные данными из ручного бэкапа?', async () => {
+            showModal(t('confirmTitle'), t('restoreManualConfirm'), async () => {
                 const formData = new FormData();
                 formData.append('target_tables', targetTables);
-
                 try {
                     const res = await fetch(API_BASE + '/admin/backup/restore', {
                         method: 'POST',
@@ -773,19 +1046,16 @@
                         body: formData
                     });
                     const data = await res.json();
-                    handleResponse(res, data, 'Восстановление из ручной копии завершено');
-                } catch (e) {
-                    showAlert('Ошибка выполнения запроса', 'error');
-                }
+                    handleResponse(res, data, t('successRestoreManual'));
+                } catch (e) { showAlert(t('errorRequest'), 'error'); }
             });
         }
 
         async function restoreAutoBackup() {
             const targetTables = document.getElementById('restoreAutoTables').value;
-            showModal('Восстановление из авто-копии', 'Эта копия была создана перед последней загрузкой файла. Перезаписать текущие данные?', async () => {
+            showModal(t('confirmTitle'), t('restoreAutoConfirm'), async () => {
                 const formData = new FormData();
                 formData.append('target_tables', targetTables);
-
                 try {
                     const res = await fetch(API_BASE + '/admin/backup/restore-auto', {
                         method: 'POST',
@@ -793,43 +1063,37 @@
                         body: formData
                     });
                     const data = await res.json();
-                    handleResponse(res, data, 'Восстановление из авто-копии завершено');
-                } catch (e) {
-                    showAlert('Ошибка выполнения запроса', 'error');
-                }
+                    handleResponse(res, data, t('successRestoreAuto'));
+                } catch (e) { showAlert(t('errorRequest'), 'error'); }
             });
         }
 
         function confirmDeleteAdmin(targetEmail) {
-            showModal('Удаление администратора', `Вы уверены, что хотите удалить администратора ${targetEmail}?`, async () => {
+            showModal(t('confirmTitle'), `${t('deleteAdminConfirm')} ${targetEmail}?`, async () => {
                 const formData = new FormData();
                 formData.append('email', targetEmail);
-
                 try {
                     const res = await fetch(API_BASE + '/admin/delete', {
                         method: 'POST',
                         headers: { 'Authorization': 'Bearer ' + token },
                         body: formData
                     });
-
                     if (res.ok) {
-                        showAlert('Администратор удален', 'success');
+                        showAlert(t('successAdminDeleted'), 'success');
                         loadAdmins();
                     } else {
                         const data = await res.json();
                         handleResponse(res, data, '');
                     }
-                } catch (e) {
-                    showAlert('Ошибка выполнения запроса', 'error');
-                }
+                } catch (e) { showAlert(t('errorRequest'), 'error'); }
             });
         }
 
         function handleResponse(res, data, successMsg) {
             if (res.ok) {
-                showAlert(successMsg || data.message || 'Успешно', 'success');
+                showAlert(successMsg || data.message || t('confirmBtn'), 'success');
             } else {
-                showAlert(data.detail || 'Ошибка выполнения действия', 'error');
+                showAlert(data.detail || t('errorRequest'), 'error');
             }
         }
 
