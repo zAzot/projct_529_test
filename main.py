@@ -7,7 +7,7 @@ import shutil
 import sqlite3
 import pandas as pd
 from datetime import datetime, timedelta, timezone
-from helpers import logger, config, LOG_FILE_PATH
+from helpers import logger, config
 import hashlib
 import secrets
 from jose import JWTError, jwt
@@ -36,6 +36,12 @@ SECRET_KEY = config.get('SECRET_KEY')
 ALGORITHM = config.get('ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = config.get('ACCESS_TOKEN_EXPIRE_MINUTES')
 ADMIN_STATIC_CODE = config.get('ADMIN_STATIC_CODE')
+DEFAULT_PAGE_SIZE = config.get('DEFAULT_PAGE_SIZE')
+HOST = config.get('HOST', '0.0.0.0')
+PORT = config.get('PORT', 8000)
+TIMEOUT_KEEP_ALIVE = config.get('TIMEOUT_KEEP_ALIVE', 5)
+LIMIT_CONCURRENCY = config.get('LIMIT_CONCURRENCY', 50)
+LIMIT_MAX_REQUESTS = config.get('LIMIT_MAX_REQUESTS', 10000)
 progress_status = {"status": "idle", "progress": 0, "message": "", "current_operation": ""}
 active_connections = []
 rate_limit_storage = defaultdict(list)
@@ -86,7 +92,7 @@ class FilterRequest(BaseModel):
     sort_by: str = None
     sort_order: str = "asc"
     page: int = 1
-    page_size: int = 50
+    page_size: int = DEFAULT_PAGE_SIZE
 
 class AdminCreate(BaseModel):
     username: str
@@ -146,17 +152,6 @@ class ContactUpdate(BaseModel):
     phone: str
     name: str
 
-async def cleanup_dead_websocket_connections():
-    dead_connections = []
-    for connection in active_connections:
-        try:
-            await connection.send_json({"type": "ping"})
-        except:
-            dead_connections.append(connection)
-    for dead in dead_connections:
-        if dead in active_connections:
-            active_connections.remove(dead)
-
 async def notify_progress(status_val: str, progress: int, message: str, current_operation: str):
     global progress_status
     progress_status = {
@@ -166,7 +161,15 @@ async def notify_progress(status_val: str, progress: int, message: str, current_
         "current_operation": current_operation,
         "timestamp": datetime.now().isoformat()
     }
-    await cleanup_dead_websocket_connections()
+    dead_connections = []
+    for connection in active_connections:
+        try:
+            await connection.send_json({"type": "ping"})
+        except:
+            dead_connections.append(connection)
+    for dead in dead_connections:
+        if dead in active_connections:
+            active_connections.remove(dead)
     for connection in active_connections:
         try:
             await connection.send_json(progress_status)
@@ -409,6 +412,30 @@ async def logging_middleware(request: Request, call_next):
             print(f"[WARN] Could not read response body: {e}")
     else:
         print(f"[INFO] Response body: <non-JSON response, status {response.status_code}>")
+    return response
+
+@app.middleware("http")
+async def time_check_middleware(request: Request, call_next):
+    client_time_str = request.headers.get("X-Client-Time")
+    if client_time_str:
+        try:
+            if client_time_str.endswith('Z'):
+                client_time_str = client_time_str[:-1] + '+00:00'
+            client_time = datetime.fromisoformat(client_time_str)
+            if client_time.tzinfo is None:
+                client_time = client_time.replace(tzinfo=timezone.utc)
+            else:
+                client_time = client_time.astimezone(timezone.utc)
+            now = datetime.now(timezone.utc)
+            diff = abs((now - client_time).total_seconds())
+            if diff > 86400:
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": "Client time difference exceeds 24 hours"}
+                )
+        except (ValueError, TypeError):
+            pass
+    response = await call_next(request)
     return response
 
 @app.middleware("http")
@@ -755,9 +782,10 @@ async def view_admin_logs(code: str):
         print(f"[ERROR] Invalid admin code provided for logs access")
         raise HTTPException(status_code=401, detail="Invalid admin code")
     try:
-        if not os.path.exists(LOG_FILE_PATH):
+        log_file_path = config.get('LOG_FILE_PATH')
+        if not os.path.exists(log_file_path):
             return JSONResponse(content={"logs": "", "message": "Log file not found"})
-        with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
+        with open(log_file_path, "r", encoding="utf-8") as f:
             log_content = f.read()
         print(f"[INFO] Admin logs accessed successfully")
         return JSONResponse(content={"logs": log_content})
@@ -779,30 +807,38 @@ async def login_page():
 async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
     print(f"[INFO] Login attempt with username: {form_data.username}")
     if form_data.username == "none":
-        provided_hash = hashlib.sha256(form_data.password.encode()).hexdigest()
-        static_code_hash = hashlib.sha256(ADMIN_STATIC_CODE.encode()).hexdigest()
-        if not hmac.compare_digest(provided_hash, static_code_hash):
-            print(f"[ERROR] Invalid super admin code")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid admin code",
-                headers={"WWW-Authenticate": "Bearer"}
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM admins WHERE username = ? OR email = ?", ("none", "none"))
+        admin_exists = cursor.fetchone()
+        conn.close()
+        if admin_exists:
+            pass
+        else:
+            provided_hash = hashlib.sha256(form_data.password.encode()).hexdigest()
+            static_code_hash = hashlib.sha256(ADMIN_STATIC_CODE.encode()).hexdigest()
+            if not hmac.compare_digest(provided_hash, static_code_hash):
+                print(f"[ERROR] Invalid super admin code")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid admin code",
+                    headers={"WWW-Authenticate": "Bearer"}
+                )
+            print(f"[INFO] Super admin authenticated successfully")
+            super_token = jwt.encode(
+                {"sub": "super_admin", "role": "super_admin", "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)},
+                SECRET_KEY,
+                algorithm=ALGORITHM
             )
-        print(f"[INFO] Super admin authenticated successfully")
-        super_token = jwt.encode(
-            {"sub": "super_admin", "role": "super_admin", "exp": datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)},
-            SECRET_KEY,
-            algorithm=ALGORITHM
-        )
-        response.set_cookie(
-            key="access_token",
-            value=super_token,
-            httponly=True,
-            secure=False,
-            samesite="lax",
-            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
-        )
-        return {"status": "success", "access_token": super_token, "token_type": "bearer", "redirect_url": "/sierra-alpha"}
+            response.set_cookie(
+                key="access_token",
+                value=super_token,
+                httponly=True,
+                secure=False,
+                samesite="lax",
+                max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+            )
+            return {"status": "success", "access_token": super_token, "token_type": "bearer", "redirect_url": "/sierra-alpha"}
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT username, email, password_hash, role FROM admins WHERE email = ? OR username = ?", (form_data.username, form_data.username))
@@ -885,6 +921,7 @@ async def register_admin(admin_data: AdminCreate, current_admin: dict = Depends(
     conn.close()
     print(f"[INFO] Admin successfully registered: {admin_data.username}")
     response_data = {"message": "Admin registered successfully", "username": admin_data.username, "email": email_value}
+    log_admin_action(current_admin, "/admin/register", str(admin_data.model_dump()), str(response_data))
     return response_data
 
 @app.post("/admin/delete")
@@ -903,6 +940,7 @@ async def delete_admin(email: str = Form(...), current_admin: dict = Depends(get
     conn.close()
     print(f"[INFO] Admin account {email} successfully deleted")
     response_data = {"message": f"Admin account {email} deleted successfully"}
+    log_admin_action(current_admin, "/admin/delete", f"email={email}", str(response_data))
     return response_data
 
 @app.get("/admin/me", response_model=UserResponse)
@@ -951,6 +989,7 @@ async def create_backup_endpoint(current_admin: dict = Depends(get_current_super
             print(f"[INFO] Manual backup created: {total_rows} rows")
             await notify_progress("completed", 100, f"Manual backup created: {total_rows} rows", "manual_backup_done")
             response_data = {"message": "Manual backup created successfully", "rows_backed_up": total_rows, "tables": ["tbl_1_pub", "tbl_2_unpub", "tbl_3_buffer"]}
+            log_admin_action(current_admin, "/admin/backup/create", "", str(response_data))
             return response_data
         except Exception as e:
             await notify_progress("error", 0, f"Error: {str(e)}", "manual_backup_error")
@@ -962,10 +1001,14 @@ async def create_backup_endpoint(current_admin: dict = Depends(get_current_super
 @app.post("/admin/backup/restore")
 async def restore_backup_endpoint(target_tables: str = Form(default="all"), current_admin: dict = Depends(get_current_super_admin)):
     print(f"[INFO] Attempt to restore from manual backup")
+    allowed_tables = ["tbl_1_pub", "tbl_2_unpub", "tbl_3_buffer"]
     if target_tables == "all":
-        tables_to_restore = ["tbl_1_pub", "tbl_2_unpub", "tbl_3_buffer"]
+        tables_to_restore = allowed_tables
     else:
         tables_to_restore = [t.strip() for t in target_tables.split(",")]
+        for t in tables_to_restore:
+            if t not in allowed_tables:
+                raise HTTPException(status_code=400, detail=f"Invalid table name: {t}")
     async with restore_lock:
         config.set_maintenance(True)
         try:
@@ -990,6 +1033,7 @@ async def restore_backup_endpoint(target_tables: str = Form(default="all"), curr
             print(f"[INFO] Restore from manual backup completed for tables: {', '.join(tables_to_restore)}")
             await notify_progress("completed", 100, f"Restored tables from manual backup: {', '.join(tables_to_restore)}", "manual_restore_done")
             response_data = {"message": "Restore from manual backup completed successfully", "restored_tables": tables_to_restore}
+            log_admin_action(current_admin, "/admin/backup/restore", f"target_tables={target_tables}", str(response_data))
             return response_data
         except Exception as e:
             await notify_progress("error", 0, f"Error: {str(e)}", "manual_restore_error")
@@ -1001,10 +1045,14 @@ async def restore_backup_endpoint(target_tables: str = Form(default="all"), curr
 @app.post("/admin/backup/restore-auto")
 async def restore_auto_backup_endpoint(target_tables: str = Form(default="all"), current_admin: dict = Depends(get_current_super_admin)):
     print(f"[INFO] Attempt to restore from auto backup")
+    allowed_tables = ["tbl_1_pub", "tbl_2_unpub", "tbl_3_buffer"]
     if target_tables == "all":
-        tables_to_restore = ["tbl_1_pub", "tbl_2_unpub", "tbl_3_buffer"]
+        tables_to_restore = allowed_tables
     else:
         tables_to_restore = [t.strip() for t in target_tables.split(",")]
+        for t in tables_to_restore:
+            if t not in allowed_tables:
+                raise HTTPException(status_code=400, detail=f"Invalid table name: {t}")
     async with restore_lock:
         config.set_maintenance(True)
         try:
@@ -1029,6 +1077,7 @@ async def restore_auto_backup_endpoint(target_tables: str = Form(default="all"),
             print(f"[INFO] Restore from auto backup completed for tables: {', '.join(tables_to_restore)}")
             await notify_progress("completed", 100, f"Restored tables from auto backup: {', '.join(tables_to_restore)}", "auto_restore_done")
             response_data = {"message": "Restore from auto backup completed successfully", "restored_tables": tables_to_restore}
+            log_admin_action(current_admin, "/admin/backup/restore-auto", f"target_tables={target_tables}", str(response_data))
             return response_data
         except Exception as e:
             await notify_progress("error", 0, f"Error: {str(e)}", "auto_restore_error")
@@ -1058,6 +1107,7 @@ async def verify_admin_password(request: Request, current_admin: dict = Depends(
     print(f"[REQW] Password verification request")
     print(f"[INFO] Admin password successfully verified")
     response_data = {"message": "Admin password verified successfully", "verified": True}
+    log_admin_action(current_admin, "/admin/verify-password", "", str(response_data))
     return response_data
 
 @app.get("/admin/admins-list")
@@ -1071,7 +1121,9 @@ async def get_admins_list(current_admin: dict = Depends(get_current_super_admin)
     conn.close()
     result = [dict(row) for row in rows]
     print(f"[INFO] Retrieved admins list: {len(result)} records")
-    return JSONResponse(content={"admins": result})
+    response_data = {"admins": result}
+    log_admin_action(current_admin, "/admin/admins-list", "", str(response_data))
+    return JSONResponse(content=response_data)
 
 @app.post("/admin/logs")
 async def get_admin_logs(request: Request, current_admin: dict = Depends(get_current_super_admin)):
@@ -1084,7 +1136,9 @@ async def get_admin_logs(request: Request, current_admin: dict = Depends(get_cur
     conn.close()
     result = [dict(row) for row in rows]
     print(f"[INFO] Retrieved logs: {len(result)} records")
-    return JSONResponse(content={"logs": result})
+    response_data = {"logs": result}
+    log_admin_action(current_admin, "/admin/logs", "", f"logs_count={len(result)}")
+    return JSONResponse(content=response_data)
 
 @app.get("/admin/table/buffer-sales")
 async def get_buffer_sales(current_admin: dict = Depends(get_current_admin)):
@@ -1170,6 +1224,12 @@ async def update_cell(update_data: CellUpdateRequest, current_admin: dict = Depe
         conn.close()
         print(f"[ERROR] Record with ID {update_data.record_id} not found")
         raise HTTPException(status_code=400, detail=f"Record with id {update_data.record_id} not found")
+    cursor.execute("PRAGMA table_info(tbl_1_pub)")
+    columns = [col[1] for col in cursor.fetchall()]
+    if update_data.column_name not in columns:
+        conn.close()
+        print(f"[ERROR] Column {update_data.column_name} does not exist in table")
+        raise HTTPException(status_code=400, detail=f"Column {update_data.column_name} does not exist")
     if update_data.column_name in ['QTY', 'Price']:
         try:
             new_value_int = int(update_data.new_value)
@@ -1341,14 +1401,14 @@ async def pages_count():
     cursor.execute("SELECT COUNT(*) FROM tbl_1_pub")
     total = cursor.fetchone()[0]
     conn.close()
-    total_pages = math.ceil(total / 50)
+    total_pages = math.ceil(total / DEFAULT_PAGE_SIZE)
     return {"total_pages": total_pages}
 
 @app.get("/data")
 async def get_data(page: int):
     if page < 1:
         raise HTTPException(status_code=400, detail="Page must be >= 1")
-    page_size = 50
+    page_size = DEFAULT_PAGE_SIZE
     offset = (page - 1) * page_size
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -1373,37 +1433,28 @@ async def start_negotiation(req: StartNegotiationRequest, current_admin: dict = 
         raise HTTPException(status_code=400, detail="Invalid quantity")
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
-    cursor.execute("SELECT QTY FROM tbl_1_pub WHERE id = ?", (req.record_id,))
+    cursor.execute("SELECT id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, Description, Photos FROM tbl_1_pub WHERE id = ?", (req.record_id,))
     row = cursor.fetchone()
     if not row:
         conn.close()
         raise HTTPException(status_code=400, detail="Record not found")
-    current_qty = row[0]
+    current_qty = row[2]
     if req.sold_qty > current_qty:
         conn.close()
         raise HTTPException(status_code=400, detail="Invalid quantity")
     try:
-        cursor.execute("UPDATE tbl_1_pub SET QTY = QTY - ? WHERE id = ? AND QTY >= ?", (req.sold_qty, req.record_id, req.sold_qty))
-        if cursor.rowcount == 0:
-            conn.close()
-            raise HTTPException(status_code=400, detail="Concurrent update failed")
-        cursor.execute("SELECT id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, Description, Photos FROM tbl_1_pub WHERE id = ?", (req.record_id,))
-        updated_row = cursor.fetchone()
-        if updated_row and updated_row[2] == 0:
+        new_qty = current_qty - req.sold_qty
+        if new_qty == 0:
             cursor.execute("DELETE FROM tbl_1_pub WHERE id = ?", (req.record_id,))
             print(f"[INFO] Row id={req.record_id} deleted due to sold_qty={req.sold_qty}")
-            row_for_buffer = updated_row
         else:
-            cursor.execute("SELECT id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, Description, Photos FROM tbl_1_pub WHERE id = ?", (req.record_id,))
-            row_for_buffer = cursor.fetchone()
-            if not row_for_buffer:
-                cursor.execute("SELECT id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, Description, Photos FROM tbl_1_pub WHERE id = ?", (req.record_id,))
-                row_for_buffer = cursor.fetchone()
+            cursor.execute("UPDATE tbl_1_pub SET QTY = ? WHERE id = ?", (new_qty, req.record_id))
         existing_ids = get_all_existing_ids(conn)
         new_buffer_id = 1
         while new_buffer_id in existing_ids or new_buffer_id == req.record_id:
             new_buffer_id += 1
-        cursor.execute("INSERT INTO tbl_3_buffer (id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, sales_negotiation_start_date, Description, Photos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (new_buffer_id, row_for_buffer[1], req.sold_qty, row_for_buffer[3], row_for_buffer[4], row_for_buffer[5], row_for_buffer[6], row_for_buffer[7], row_for_buffer[8], row_for_buffer[9], row_for_buffer[10], datetime.now(), row_for_buffer[11], row_for_buffer[12]))
+        cursor.execute("INSERT INTO tbl_3_buffer (id, Code, QTY, NAME, Brand, Model, PLACE, Price, Conditions, Truck_models, Publishing_date, sales_negotiation_start_date, Description, Photos) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (new_buffer_id, row[1], req.sold_qty, row[3], row[4], row[5], row[6], row[7], row[8], row[9], row[10], datetime.now(), row[11], row[12]))
         conn.commit()
     except Exception as e:
         conn.rollback()
@@ -1617,6 +1668,8 @@ async def upload_file(file: UploadFile = File(...), current_admin: dict = Depend
             conn.rollback()
             raise e
         finally:
+            if 'conn_src' in locals():
+                conn_src.close()
             conn.close()
         progress_status["status"] = "completed"
         progress_status["progress"] = 100
@@ -1698,4 +1751,11 @@ async def update_contacts(contact: ContactUpdate, current_admin: dict = Depends(
 if __name__ == "__main__":
     import uvicorn
     print("[INFO] Starting uvicorn server")
-    uvicorn.run(app, host="0.0.0.0", port=8000, timeout_keep_alive=5, limit_concurrency=50, limit_max_requests=10000)
+    uvicorn.run(
+        app,
+        host=HOST,
+        port=PORT,
+        timeout_keep_alive=TIMEOUT_KEEP_ALIVE,
+        limit_concurrency=LIMIT_CONCURRENCY,
+        limit_max_requests=LIMIT_MAX_REQUESTS
+    )

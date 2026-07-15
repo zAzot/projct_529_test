@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Системное управление - Админ панель</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" id="faviconLink">
     <style>
         * {
             margin: 0;
@@ -14,30 +14,22 @@
         :root {
             --page-background: rgba(217, 217, 191, 0.40);
             --text-color-base: #222;
-            --text-gray: #555;
+            --text-gray: #666;
             --panel-background: #fff;
             --panel-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             --content-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             --border-color-gray: #e0e0e0;
             --border-color-gray-dark: #ccc;
-            --btn-orange-background: #ffa726;
             --btn-black-background: #222;
             --btn-black-background-hover: #000;
             --btn-black-color: #fff;
-            --btn-graphite-background: #90a4ae;
-            --btn-graphite-background-hover: #9badb6;
-            --btn-danger-background: #e57373;
-            --btn-danger-background-hover: #e68a8a;
-            --btn-success-background: #7cb342;
-            --btn-success-background-hover: #8bc34a;
-            --btn-info-background: #17a2b8;
-            --btn-info-background-hover: #138496;
             --input-background: #fff;
             --input-border: 1px solid #d2d2d2;
             --input-border-radius: 4px;
-            --hover-item-background: #f0f0e8;
-            --content-border-radius: 8px;
             --table-header-background: #f5f5ef;
+            --hover-item-background: #fcfcfc;
+            --content-border-radius: 8px;
+            --sidebar-width: 280px;
         }
 
         body {
@@ -51,7 +43,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -62,28 +54,62 @@
             box-shadow: var(--content-box-shadow);
             padding: 18px 24px;
             margin-bottom: 24px;
+            border: 1px solid var(--border-color-gray);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border-color-gray);
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
-        .header-logo {
-            height: 50px;
-            width: auto;
-            object-fit: contain;
+        .header-left {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .header-right {
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-contacts {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.2;
+        }
+
+        .contact-pretext {
+            font-size: 14px;
+            color: var(--text-color-base);
+            margin-bottom: 4px;
+        }
+
+        .contact-name {
+            font-size: 26px;
+            color: var(--text-gray);
+        }
+
+        .contact-phone {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+            .contact-phone:hover {
+                color: var(--text-color-base);
+            }
+
+        .header-logo {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
         }
 
         .language-switcher {
@@ -106,15 +132,15 @@
             transition: all 0.2s ease;
         }
 
-        .lang-toggle:hover {
-            background: var(--hover-item-background);
-        }
+            .lang-toggle:hover {
+                background: var(--hover-item-background);
+            }
 
-        .lang-toggle::after {
-            content: '▼';
-            font-size: 10px;
-            transition: transform 0.2s ease;
-        }
+            .lang-toggle::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s ease;
+            }
 
         .language-switcher.open .lang-toggle::after {
             transform: rotate(180deg);
@@ -152,14 +178,14 @@
             transition: background 0.2s ease;
         }
 
-        .lang-option:hover {
-            background: var(--hover-item-background);
-        }
+            .lang-option:hover {
+                background: var(--hover-item-background);
+            }
 
-        .lang-option.active {
-            background: var(--btn-black-background);
-            color: #fff;
-        }
+            .lang-option.active {
+                background: var(--btn-black-background);
+                color: #fff;
+            }
 
         .btn {
             align-items: center;
@@ -169,11 +195,15 @@
             display: inline-flex;
             height: 38px;
             justify-content: center;
+            line-height: 1;
+            min-width: 110px;
             padding: 0 16px;
-            font-size: 15px;
-            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
             transition: all 0.2s ease;
             white-space: nowrap;
+            font-size: 15px;
+            font-weight: 500;
         }
 
             .btn:hover {
@@ -185,13 +215,6 @@
                 transform: translateY(0);
             }
 
-        .btn--small {
-            min-width: auto;
-            height: 32px;
-            padding: 0 12px;
-            font-size: 14px;
-        }
-
         .btn--black {
             background: var(--btn-black-background);
             color: var(--btn-black-color);
@@ -201,924 +224,994 @@
                 background: var(--btn-black-background-hover);
             }
 
-        .btn--danger {
-            background: var(--btn-danger-background);
-            color: #fff;
+        .btn--transparent {
+            background: transparent;
+            color: var(--text-color-base);
+            border: 1px solid var(--border-color-gray);
         }
 
-            .btn--danger:hover {
-                background: var(--btn-danger-background-hover);
+            .btn--transparent:hover {
+                background: var(--hover-item-background);
             }
 
-        .btn--success {
-            background: var(--btn-success-background);
-            color: #fff;
+        .btn--small {
+            min-width: auto;
+            height: 32px;
+            padding: 0 12px;
+            font-size: 14px;
         }
 
-            .btn--success:hover {
-                background: var(--btn-success-background-hover);
-            }
-
-        .btn--cancel {
-            background: var(--btn-graphite-background);
-            color: #fff;
-        }
-
-            .btn--cancel:hover {
-                background: var(--btn-graphite-background-hover);
-            }
-
-        .btn--info {
-            background: var(--btn-info-background);
-            color: #fff;
-        }
-
-            .btn--info:hover {
-                background: var(--btn-info-background-hover);
-            }
-
-        .full-width {
+        .btn--filter {
+            display: none;
+            background: var(--btn-black-background);
+            color: var(--btn-black-color);
             width: 100%;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .form-group {
             margin-bottom: 16px;
-            text-align: left;
         }
 
-            .form-group label {
-                display: block;
-                margin-bottom: 8px;
-                font-size: 14px;
-                font-weight: 500;
-                color: var(--text-gray);
+        .main-layout {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+        }
+
+        .content-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .filters-card {
+            background: var(--panel-background);
+            border-radius: var(--content-border-radius);
+            box-shadow: var(--content-box-shadow);
+            padding: 20px;
+            border: 1px solid var(--border-color-gray);
+        }
+
+            .filters-card h3 {
+                font-size: 18px;
+                margin-bottom: 18px;
+                padding-bottom: 12px;
+                border-bottom: 1px solid var(--border-color-gray);
+                font-weight: 600;
             }
 
-            .form-group input, .form-group select {
+        .filter-group {
+            margin-bottom: 16px;
+        }
+
+            .filter-group label {
+                display: block;
+                font-size: 14px;
+                color: var(--text-gray);
+                margin-bottom: 6px;
+                font-weight: 500;
+            }
+
+            .filter-group input, .filter-group select {
                 width: 100%;
                 padding: 10px 12px;
                 background-color: var(--input-background);
                 border: var(--input-border);
                 border-radius: var(--input-border-radius);
+                color: var(--text-color-base);
                 font-size: 15px;
                 transition: all 0.2s ease;
             }
 
-                .form-group input:focus, .form-group select:focus {
+                .filter-group input:focus, .filter-group select:focus {
                     border-color: var(--btn-black-background);
                     outline: none;
                 }
 
-        .nav-tabs {
-            background: var(--panel-background);
-            border-radius: var(--content-border-radius);
-            box-shadow: var(--content-box-shadow);
-            padding: 10px 12px;
-            margin-bottom: 24px;
-            display: flex;
-            gap: 8px;
-            border: 1px solid var(--border-color-gray);
-            flex-wrap: wrap;
-        }
-
-        .nav-tab {
-            background: transparent;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.2s;
-        }
-
-            .nav-tab:hover {
-                background: var(--hover-item-background);
-            }
-
-            .nav-tab.active {
-                background: var(--btn-black-background);
-                color: #fff;
-            }
-
-        .tab-content {
-            display: none;
-        }
-
-            .tab-content.active {
-                display: block;
-                animation: fadeIn 0.3s ease;
-            }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .cards-grid {
+        .filter-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 24px;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
         }
 
-        .action-card {
-            background: var(--panel-background);
-            border-radius: var(--content-border-radius);
-            box-shadow: var(--content-box-shadow);
-            padding: 24px;
-            border: 1px solid var(--border-color-gray);
+        .filter-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
         }
-
-            .action-card h3 {
-                font-size: 18px;
-                margin-bottom: 12px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid var(--border-color-gray);
-            }
-
-            .action-card p {
-                color: var(--text-gray);
-                font-size: 14px;
-                margin-bottom: 20px;
-            }
 
         .table-container {
             background: var(--panel-background);
             border-radius: var(--content-border-radius);
             box-shadow: var(--content-box-shadow);
-            padding: 20px;
-            overflow-x: auto;
+            overflow: hidden;
             border: 1px solid var(--border-color-gray);
         }
-
-        .table-header-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-            .table-header-actions h3 {
-                font-size: 18px;
-                font-weight: 600;
-            }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
         }
 
-        th, td {
-            padding: 14px 12px;
-            text-align: left;
+        td {
+            padding: 20px;
             border-bottom: 1px solid var(--border-color-gray);
+            vertical-align: top;
         }
 
-        th {
-            background: var(--table-header-background);
-            font-weight: 600;
-            color: var(--text-color-base);
+        tr:last-child td {
+            border-bottom: none;
         }
 
         tr:hover {
             background: var(--hover-item-background);
         }
 
-        .log-data-cell {
-            max-width: 250px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .col-photo {
+            width: 1%;
+            white-space: nowrap;
+            text-align: center;
+            border-right: 1px solid transparent;
+        }
+
+        .item-photo {
+            width: 110px;
+            height: 110px;
+            object-fit: contain;
+            border-radius: 4px;
+            border: 1px solid var(--border-color-gray);
+            background-color: #fff;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .col-info {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .item-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color-base);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .item-specs {
+            font-size: 15px;
+            color: var(--text-color-base);
+            line-height: 1.6;
+        }
+
+            .item-specs span.bullet {
+                color: #ccc;
+                margin: 0 6px;
+            }
+
+        .col-action {
+            width: 200px;
+            text-align: right;
+            border-left: 1px solid var(--border-color-gray);
+            background-color: #fafafa;
+        }
+
+        .item-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-gray);
+            margin-bottom: 15px;
             white-space: nowrap;
         }
 
-        .alert {
-            position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 24px;
-            border-radius: 4px;
-            color: #fff;
-            z-index: 4000;
-            animation: slideIn 0.3s ease;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+            padding: 20px;
         }
 
-        .alert-success {
-            background: var(--btn-success-background);
-        }
-
-        .alert-error {
-            background: var(--btn-danger-background);
-        }
-
-        .alert-info {
-            background: var(--btn-info-background);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
+            .pagination button {
+                background: var(--panel-background);
+                border: 1px solid var(--border-color-gray);
+                border-radius: 4px;
+                cursor: pointer;
+                padding: 8px 16px;
+                transition: all 0.2s;
+                font-size: 15px;
+                color: var(--text-color-base);
+                font-weight: 500;
             }
 
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
+                .pagination button.active {
+                    background: var(--btn-black-background);
+                    border-color: var(--btn-black-background);
+                    color: #fff;
+                }
 
-        .modal {
+                .pagination button:hover:not(.active) {
+                    background: var(--hover-item-background);
+                }
+
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-            .modal.active {
-                display: flex;
-                animation: fadeIn 0.2s;
+            .modal-overlay.active {
+                display: block;
+                opacity: 1;
             }
 
-        .modal-content {
+        .item-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -45%);
             background: var(--panel-background);
-            padding: 25px;
-            border-radius: var(--content-border-radius);
-            width: 90%;
-            max-width: 400px;
-            text-align: center;
-            box-shadow: var(--content-box-shadow);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 95%;
+            max-width: 1400px;
+            max-height: 95vh;
+            z-index: 2001;
+            opacity: 0;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            flex-direction: column;
         }
 
-            .modal-content h3 {
-                margin-bottom: 15px;
+            .item-modal.active {
+                display: flex;
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-gray);
+            z-index: 10;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+            .modal-close-btn:hover {
+                color: #e57373;
+            }
+
+        .modal-content-split {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .modal-photo-col {
+            flex: 2;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-right: 1px solid var(--border-color-gray);
+            overflow-y: auto;
+        }
+
+            .modal-photo-col img {
+                width: auto;
+                height: auto;
+                max-width: 100%;
+                max-height: 85vh;
+                object-fit: contain;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            }
+
+        .modal-info-col {
+            flex: 1;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: 95vh;
+        }
+
+        .modal-item-title {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.2;
+            padding-right: 20px;
+        }
+
+        .modal-description {
+            margin-top: 10px;
+        }
+
+            .modal-description h4 {
+                font-size: 16px;
+                margin-bottom: 8px;
+                color: var(--text-color-base);
+            }
+
+            .modal-description p {
+                color: var(--text-gray);
+                font-size: 14px;
+                line-height: 1.6;
+                white-space: pre-wrap;
+            }
+
+        .mobile-product-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 16px;
+        }
+
+        .mobile-product-card {
+            background: var(--panel-background);
+            border: 1px solid var(--border-color-gray);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: var(--panel-box-shadow);
+        }
+
+            .mobile-product-card .item-photo {
+                margin: 0 auto 16px auto;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .mobile-product-card .item-title {
+                margin-top: 8px;
+            }
+
+            .mobile-product-card .item-specs {
+                margin: 12px 0;
+                font-size: 14px;
+            }
+
+            .mobile-product-card .item-price {
+                margin: 12px 0;
+                text-align: left;
+                white-space: normal;
+            }
+
+            .mobile-product-card .btn {
+                width: 100%;
+            }
+
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .container {
+                padding: 12px;
+            }
+
+            .header-logo {
+                height: 60px;
+            }
+
+            .header-contacts {
+                margin-left: 0;
+            }
+
+            .contact-pretext {
+                font-size: 12px;
+            }
+
+            .contact-name {
+                font-size: 18px;
+            }
+
+            .contact-phone {
+                font-size: 18px;
+            }
+
+            .header-right {
+                width: auto;
+                justify-content: flex-end;
+            }
+
+            .header-left {
+                width: auto;
+                justify-content: flex-start;
+                margin-bottom: 0;
+            }
+
+            .btn--filter {
+                display: flex;
+            }
+
+            .main-layout {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                display: none;
+                position: static;
+                top: auto;
+            }
+
+                .sidebar.show {
+                    display: block;
+                    margin-bottom: 20px;
+                }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content-split {
+                flex-direction: column;
+            }
+
+            .modal-close-btn {
+                top: 8px;
+                right: 8px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+
+            .modal-photo-col {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color-gray);
+                padding: 45px 15px 15px 15px;
+                max-height: 50vh;
+            }
+
+                .modal-photo-col img {
+                    max-height: 45vh;
+                }
+
+            .modal-info-col {
+                padding: 20px;
+                max-height: 45vh;
+            }
+
+            .table-container table,
+            .table-container tbody,
+            .table-container tr,
+            .table-container td {
+                display: block;
+                width: 100%;
+            }
+
+            .table-container tr {
+                margin-bottom: 20px;
+                border: 1px solid var(--border-color-gray);
+                border-radius: 12px;
+                padding: 16px;
+                background: var(--panel-background);
+            }
+
+            .table-container td {
+                border: none;
+                padding: 8px 0;
                 text-align: left;
             }
 
-            .modal-content p {
-                color: var(--text-gray);
-                margin-bottom: 20px;
+            .table-container .col-photo {
+                text-align: center;
             }
 
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 20px;
+            .table-container .col-action {
+                border-left: none;
+                background: transparent;
+                text-align: left;
+            }
+
+            .table-container .item-photo {
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+            }
+
+            .table-container .item-price {
+                white-space: normal;
+            }
+
+            .mobile-product-list {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                padding: 12px;
+            }
+
+            .mobile-product-card .item-title {
+                word-break: break-word;
+            }
         }
 
-        input, textarea {
-            caret-color: auto !important;
+        @media (min-width: 769px) {
+            .sidebar {
+                position: sticky;
+                top: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="mainWrapper" style="display: none;">
-        <div class="header">
-            <div class="header-left">
-                <img id="headerLogo" class="header-logo" src="" alt="Logo" style="display: none;">
-            </div>
-            <div class="header-right">
-                <div class="language-switcher" id="languageSwitcher">
-                    <button class="lang-toggle" id="langToggle">RU</button>
-                    <div class="lang-menu" id="langMenu">
-                        <button class="lang-option active" data-lang="ru">RU</button>
-                        <button class="lang-option" data-lang="en">EN</button>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn btn--graphite" onclick="localStorage.removeItem('adminToken'); window.location.href = '/login';">Выйти</button>
-                </div>
-            </div>
+    <div style="display: none;" id="hiddenContactsTemplate">
+        <div id="headerContacts" class="header-contacts">
+            <div class="contact-pretext" data-i18n="contactPretext">по питання купівлі звоніть за тепефоном:</div>
+            <a id="contactPhone" class="contact-phone" href=""></a>
+            <div id="contactName" class="contact-name"></div>
         </div>
-        <div class="nav-tabs">
-            <button class="nav-tab active" data-tab="backupTab" data-i18n="backupTab">Резервные копии (БД)</button>
-            <button class="nav-tab" data-tab="adminsTab" data-i18n="adminsTab">Управление доступом</button>
-            <button class="nav-tab" data-tab="logsTab" data-i18n="logsTab">Логи</button>
-            <button class="nav-tab" data-tab="contactsTab" data-i18n="contactsTab">Контакты продавца</button>
-        </div>
-
-        <div id="backupTab" class="tab-content active">
-            <div class="cards-grid">
-                <div class="action-card">
-                    <h3 data-i18n="manualBackupTitle">Создание ручной копии</h3>
-                    <p data-i18n="manualBackupDesc">Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.</p>
-                    <button class="btn btn--success full-width" onclick="createManualBackup()" data-i18n="createBackupBtn">Создать бэкап</button>
-                </div>
-                <div class="action-card">
-                    <h3 data-i18n="restoreManualTitle">Восстановление (Ручная копия)</h3>
-                    <p data-i18n="restoreManualDesc">Восстановить данные из таблицы manual_backup.</p>
-                    <div class="form-group">
-                        <label data-i18n="restoreTablesLabel">Таблицы для восстановления</label>
-                        <select id="restoreManualTables">
-                            <option value="all" data-i18n="allTablesOption">Все (pub, unpub, buffer)</option>
-                            <option value="tbl_1_pub" data-i18n="onlyPubOption">Только tbl_1_pub</option>
-                            <option value="tbl_2_unpub" data-i18n="onlyUnpubOption">Только tbl_2_unpub</option>
-                            <option value="tbl_3_buffer" data-i18n="onlyBufferOption">Только tbl_3_buffer</option>
-                        </select>
-                    </div>
-                    <button class="btn btn--black full-width" onclick="restoreManualBackup()" data-i18n="restoreBtn">Восстановить данные</button>
-                </div>
-                <div class="action-card">
-                    <h3 data-i18n="restoreAutoTitle">Восстановление (Авто-копия)</h3>
-                    <p data-i18n="restoreAutoDesc">Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.</p>
-                    <div class="form-group">
-                        <label data-i18n="restoreTablesLabel">Таблицы для восстановления</label>
-                        <select id="restoreAutoTables">
-                            <option value="all" data-i18n="allTablesOption">Все (pub, unpub, buffer)</option>
-                            <option value="tbl_1_pub" data-i18n="onlyPubOption">Только tbl_1_pub</option>
-                            <option value="tbl_2_unpub" data-i18n="onlyUnpubOption">Только tbl_2_unpub</option>
-                            <option value="tbl_3_buffer" data-i18n="onlyBufferOption">Только tbl_3_buffer</option>
-                        </select>
-                    </div>
-                    <button class="btn btn--black full-width" onclick="restoreAutoBackup()" data-i18n="restoreBtn">Восстановить данные</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="adminsTab" class="tab-content">
-            <div class="table-container">
-                <div class="table-header-actions">
-                    <h3 data-i18n="adminsListTitle">Список администраторов</h3>
-                    <button class="btn btn--black btn--small" onclick="showAddAdminModal()" data-i18n="addAdminBtn">+ Добавить нового администратора</button>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr><th data-i18n="loginCol">Логин</th><th data-i18n="emailCol">Почта</th><th data-i18n="passwordCol">Пароль</th><th data-i18n="actionCol">Действие</th></tr>
-                        </thead>
-                        <tbody id="adminsTableBody">
-                            <tr><td colspan="4" class="text-center" data-i18n="loading">Загрузка</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="logsTab" class="tab-content">
-            <div class="table-container">
-                <div class="table-header-actions">
-                    <h3 data-i18n="logsTitle">Логи администраторов</h3>
-                    <button class="btn btn--black btn--small" onclick="loadLogs()" data-i18n="refreshBtn">Обновить</button>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr><th>ID</th><th data-i18n="loginCol">Логин</th><th data-i18n="endpointCol">Эндпоинт</th><th data-i18n="requestDataCol">Request Data</th><th data-i18n="responseDataCol">Response Data</th><th data-i18n="createdAtCol">Время создания</th></tr>
-                        </thead>
-                        <tbody id="logsTableBody">
-                            <tr><td colspan="6" class="text-center" data-i18n="loading">Загрузка</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <div id="contactsTab" class="tab-content">
-            <div class="cards-grid">
-                <div class="action-card">
-                    <h3 data-i18n="contactsTitle">Управление контактами продавца</h3>
-                    <p data-i18n="contactsDesc">Эти контактные данные будут отображаться для пользователей на сайте.</p>
-                    <div class="form-group">
-                        <label data-i18n="phoneLabel">Номер телефона</label>
-                        <input type="text" id="contactPhone" placeholder="Например: +380991234567">
-                    </div>
-                    <div class="form-group">
-                        <label data-i18n="nameLabel">Имя продавца</label>
-                        <input type="text" id="contactName" placeholder="Например: Александр">
-                    </div>
-                    <button class="btn btn--success full-width" onclick="confirmUpdateContacts()" data-i18n="saveContactsBtn">Сохранить контакты</button>
-                </div>
-            </div>
-        </div>
-
     </div>
-
-    <div id="confirmModal" class="modal">
-        <div class="modal-content">
-            <h3 id="modalTitle" style="text-align: center;" data-i18n="confirmTitle">Подтверждение</h3>
-            <p id="modalMessage" data-i18n="confirmMessage">Вы уверены?</p>
-            <div class="modal-buttons">
-                <button class="btn btn--cancel" onclick="document.getElementById('confirmModal').classList.remove('active'); confirmActionCallback = null;" data-i18n="cancelBtn">Отмена</button>
-                <button class="btn btn--danger" id="modalConfirmBtn" data-i18n="confirmBtn">Подтвердить</button>
+    <div id="itemModalOverlay" class="modal-overlay" onclick="closeItemModal()"></div>
+    <div id="itemModal" class="item-modal">
+        <button class="modal-close-btn" onclick="closeItemModal()">&times;</button>
+        <div class="modal-content-split">
+            <div class="modal-photo-col">
+                <img id="modalFullPhoto" src="" alt="">
+            </div>
+            <div class="modal-info-col">
+                <h2 id="modalItemTitle" class="modal-item-title"></h2>
+                <div id="modalItemSpecs" class="item-specs" style="margin-top: 15px; border-bottom: 1px solid var(--border-color-gray); padding-bottom: 15px;"></div>
+                <div class="modal-description">
+                    <h4 data-i18n="modalDescTitle">Описание товара</h4>
+                    <p id="modalItemDescription"></p>
+                </div>
+                <div id="modalContactsContainer" class="header-contacts" style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-color-gray);"></div>
             </div>
         </div>
     </div>
-    <div id="addAdminModal" class="modal">
-        <div class="modal-content">
-            <h3 style="text-align: center;" data-i18n="addAdminTitle">Добавить нового администратора</h3>
-            <div class="form-group">
-                <label data-i18n="usernameLabel">Логин (Username)</label>
-                <input type="text" id="regUsername" placeholder="Только буквы и цифры">
-            </div>
-            <div class="form-group">
-                <label data-i18n="emailLabel">Email (необязательно)</label>
-                <input type="email" id="regEmail" placeholder="admin@example.com">
-            </div>
-            <div class="form-group">
-                <label data-i18n="passwordLabel">Пароль</label>
-                <div style="display: flex; gap: 8px;">
-                    <button type="button" id="generatePwdBtn" class="btn btn--info" style="display: none; padding: 0 12px; font-size: 13px;" title="Сгенерировать случайный пароль" data-i18n="generateBtn">Сгенерировать</button>
-                    <input type="password" id="regPassword" placeholder="Минимум 6 символов" style="flex: 1;">
+    <div class="container">
+        <div id="mainContent">
+            <div class="header">
+                <div class="header-left">
+                    <img id="headerLogo" class="header-logo" src="" alt="Logo" style="display: none;">
+                </div>
+                <div class="header-right">
+                    <div class="language-switcher" id="languageSwitcher">
+                        <button class="lang-toggle" id="langToggle">RU</button>
+                        <div class="lang-menu" id="langMenu">
+                            <button class="lang-option active" data-lang="ru">RU</button>
+                            <button class="lang-option" data-lang="en">EN</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="modal-buttons">
-                <button class="btn btn--cancel" onclick="document.getElementById('addAdminModal').classList.remove('active');" data-i18n="cancelBtn">Отмена</button>
-                <button class="btn btn--success" onclick="registerAdmin()" data-i18n="addBtn">Добавить</button>
+            <button class="btn btn--filter" onclick="const sidebar = document.getElementById('filtersSidebar'); sidebar.classList.toggle('show');">Фильтры</button>
+            <div class="main-layout">
+                <div class="sidebar" id="filtersSidebar">
+                    <div class="filters-card">
+                        <h3 data-i18n="filtersTitle">Фильтры товаров</h3>
+                        <div class="filter-group">
+                            <label data-i18n="filterCodeLabel">Код товара</label>
+                            <input type="text" id="filterCode" placeholder="" data-i18n-placeholder="filterCodePlaceholder">
+                        </div>
+                        <div class="filter-group">
+                            <label data-i18n="filterNameLabel">Название</label>
+                            <input type="text" id="filterName" placeholder="" data-i18n-placeholder="filterNamePlaceholder">
+                        </div>
+                        <div class="filter-group">
+                            <label data-i18n="filterBrandLabel">Бренд</label>
+                            <input type="text" id="filterBrand" placeholder="" data-i18n-placeholder="filterBrandPlaceholder">
+                        </div>
+                        <div class="filter-group">
+                            <label data-i18n="filterModelLabel">Модель</label>
+                            <input type="text" id="filterModel" placeholder="" data-i18n-placeholder="filterModelPlaceholder">
+                        </div>
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label data-i18n="filterPriceMinLabel">Цена от</label>
+                                <input type="number" id="filterPriceMin" placeholder="" data-i18n-placeholder="filterPriceMinPlaceholder">
+                            </div>
+                            <div class="filter-group">
+                                <label data-i18n="filterPriceMaxLabel">Цена до</label>
+                                <input type="number" id="filterPriceMax" placeholder="" data-i18n-placeholder="filterPriceMaxPlaceholder">
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <label data-i18n="filterConditionLabel">Состояние</label>
+                            <input type="text" id="filterCondition" placeholder="" data-i18n-placeholder="filterConditionPlaceholder">
+                        </div>
+                        <div class="filter-actions">
+                            <button id="applyFiltersBtn" class="btn btn--black btn--small" data-i18n="applyBtn">Применить</button>
+                            <button id="resetFiltersBtn" class="btn btn--transparent btn--small" data-i18n="resetBtn">Сбросить</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="content-area">
+                    <div class="table-container" id="tableContainer">
+                        <table id="dataTable">
+                            <tbody id="tableBody">
+                                <tr><td colspan="3" style="text-align: center;" data-i18n="loading">Загрузка...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="pagination" class="pagination"></div>
+                </div>
             </div>
         </div>
     </div>
-
     <script>
         const translations = {
             ru: {
-                backupTab: 'Резервные копии (БД)',
-                adminsTab: 'Управление доступом',
-                logsTab: 'Логи',
-                contactsTab: 'Контакты продавца',
-                manualBackupTitle: 'Создание ручной копии',
-                manualBackupDesc: 'Скопировать текущие данные таблиц (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) в ручной бэкап.',
-                createBackupBtn: 'Создать бэкап',
-                restoreManualTitle: 'Восстановление (Ручная копия)',
-                restoreManualDesc: 'Восстановить данные из таблицы manual_backup.',
-                restoreTablesLabel: 'Таблицы для восстановления',
-                allTablesOption: 'Все (pub, unpub, buffer)',
-                onlyPubOption: 'Только tbl_1_pub',
-                onlyUnpubOption: 'Только tbl_2_unpub',
-                onlyBufferOption: 'Только tbl_3_buffer',
-                restoreBtn: 'Восстановить данные',
-                restoreAutoTitle: 'Восстановление (Авто-копия)',
-                restoreAutoDesc: 'Восстановить данные из автоматической копии (backup_table), которая была создана при последней загрузке файла.',
-                adminsListTitle: 'Список администраторов',
-                addAdminBtn: '+ Добавить нового администратора',
-                loginCol: 'Логин',
-                emailCol: 'Почта',
-                passwordCol: 'Пароль',
-                actionCol: 'Действие',
-                logsTitle: 'Логи администраторов',
-                refreshBtn: 'Обновить',
-                endpointCol: 'Эндпоинт',
-                requestDataCol: 'Request Data',
-                responseDataCol: 'Response Data',
-                createdAtCol: 'Время создания',
-                contactsTitle: 'Управление контактами продавца',
-                contactsDesc: 'Эти контактные данные будут отображаться для пользователей на сайте.',
-                phoneLabel: 'Номер телефона',
-                nameLabel: 'Имя продавца',
-                saveContactsBtn: 'Сохранить контакты',
-                confirmTitle: 'Подтверждение',
-                confirmMessage: 'Вы уверены?',
-                cancelBtn: 'Отмена',
-                confirmBtn: 'Подтвердить',
-                addAdminTitle: 'Добавить нового администратора',
-                usernameLabel: 'Логин (Username)',
-                emailLabel: 'Email (необязательно)',
-                passwordLabel: 'Пароль',
-                generateBtn: 'Сгенерировать',
-                addBtn: 'Добавить',
-                loading: 'Загрузка',
-                deleteAdminConfirm: 'Вы уверены, что хотите удалить администратора',
-                updateContactsConfirm: 'Вы уверены, что хотите сохранить новые контактные данные?',
-                createBackupConfirm: 'Вы уверены, что хотите перезаписать текущий ручной бэкап новыми данными?',
-                restoreManualConfirm: 'Вы уверены, что хотите перезаписать текущие данные данными из ручного бэкапа?',
-                restoreAutoConfirm: 'Эта копия была создана перед последней загрузкой файла. Перезаписать текущие данные?',
-                successContactsUpdated: 'Контактные данные успешно обновлены',
-                successBackupCreated: 'Ручная копия успешно создана',
-                successRestoreManual: 'Восстановление из ручной копии завершено',
-                successRestoreAuto: 'Восстановление из авто-копии завершено',
-                successAdminCreated: 'Администратор успешно создан',
-                successAdminDeleted: 'Администратор удален',
-                errorAuth: 'Ошибка авторизации',
-                errorLoadAdmins: 'Не удалось загрузить список',
-                errorLoadLogs: 'Не удалось загрузить логи',
-                errorRequest: 'Ошибка выполнения запроса',
-                errorConnection: 'Ошибка подключения',
-                errorRequiredFields: 'Заполните обязательные поля (Логин и Пароль)'
+                contactPretext: 'по вопросу покупки звоните по телефону:',
+                filtersTitle: 'Фильтры товаров',
+                filterCodeLabel: 'Код товара', filterCodePlaceholder: 'Введите код',
+                filterNameLabel: 'Название', filterNamePlaceholder: 'Название товара',
+                filterBrandLabel: 'Бренд', filterBrandPlaceholder: 'Бренд',
+                filterModelLabel: 'Модель', filterModelPlaceholder: 'Модель',
+                filterPriceMinLabel: 'Цена от', filterPriceMinPlaceholder: 'мин',
+                filterPriceMaxLabel: 'Цена до', filterPriceMaxPlaceholder: 'макс',
+                filterConditionLabel: 'Состояние', filterConditionPlaceholder: 'Состояние товара',
+                applyBtn: 'Применить', resetBtn: 'Сбросить', mobileFilterBtn: 'Фильтры',
+                loading: 'Загрузка...', noItems: 'Товаров не найдено', errorLoading: 'Ошибка загрузки данных',
+                connectionError: 'Не удалось соединиться с сервером', detailsBtn: 'Подробнее', priceEuro: '€',
+                prev: '‹ Назад', next: 'Далее ›',
+                modalDescTitle: 'Описание товара', defaultDescription: 'Детальное описание для этого товара отсутствует.',
+                itemNotFound: 'Товар не найден или удален.', connectionErrorModal: 'Не удалось загрузить детали с сервера.',
+                loadingTitle: 'Загрузка...', loadingDesc: 'Ожидайте...', errorTitle: 'Ошибка', connectionErrorTitle: 'Ошибка соединения',
+                codeLabel: 'Код:', brandLabel: 'Бренд:', modelLabel: 'Модель:', conditionLabel: 'Состояние:', autoLabel: 'Авто:'
             },
             en: {
-                backupTab: 'Backups (DB)',
-                adminsTab: 'Access Management',
-                logsTab: 'Logs',
-                contactsTab: 'Seller Contacts',
-                manualBackupTitle: 'Create Manual Backup',
-                manualBackupDesc: 'Copy current data from tables (tbl_1_pub, tbl_2_unpub, tbl_3_buffer) to manual backup.',
-                createBackupBtn: 'Create Backup',
-                restoreManualTitle: 'Restore (Manual Backup)',
-                restoreManualDesc: 'Restore data from manual_backup table.',
-                restoreTablesLabel: 'Tables to restore',
-                allTablesOption: 'All (pub, unpub, buffer)',
-                onlyPubOption: 'Only tbl_1_pub',
-                onlyUnpubOption: 'Only tbl_2_unpub',
-                onlyBufferOption: 'Only tbl_3_buffer',
-                restoreBtn: 'Restore Data',
-                restoreAutoTitle: 'Restore (Auto Backup)',
-                restoreAutoDesc: 'Restore data from automatic backup (backup_table) created during last file upload.',
-                adminsListTitle: 'Administrators List',
-                addAdminBtn: '+ Add New Administrator',
-                loginCol: 'Login',
-                emailCol: 'Email',
-                passwordCol: 'Password',
-                actionCol: 'Action',
-                logsTitle: 'Admin Logs',
-                refreshBtn: 'Refresh',
-                endpointCol: 'Endpoint',
-                requestDataCol: 'Request Data',
-                responseDataCol: 'Response Data',
-                createdAtCol: 'Created At',
-                contactsTitle: 'Manage Seller Contacts',
-                contactsDesc: 'These contact details will be displayed to users on the website.',
-                phoneLabel: 'Phone Number',
-                nameLabel: 'Seller Name',
-                saveContactsBtn: 'Save Contacts',
-                confirmTitle: 'Confirmation',
-                confirmMessage: 'Are you sure?',
-                cancelBtn: 'Cancel',
-                confirmBtn: 'Confirm',
-                addAdminTitle: 'Add New Administrator',
-                usernameLabel: 'Username',
-                emailLabel: 'Email (optional)',
-                passwordLabel: 'Password',
-                generateBtn: 'Generate',
-                addBtn: 'Add',
-                loading: 'Loading',
-                deleteAdminConfirm: 'Are you sure you want to delete the administrator',
-                updateContactsConfirm: 'Are you sure you want to save the new contact details?',
-                createBackupConfirm: 'Are you sure you want to overwrite the current manual backup with new data?',
-                restoreManualConfirm: 'Are you sure you want to overwrite current data with data from the manual backup?',
-                restoreAutoConfirm: 'This backup was created before the last file upload. Overwrite current data?',
-                successContactsUpdated: 'Contact details successfully updated',
-                successBackupCreated: 'Manual backup successfully created',
-                successRestoreManual: 'Restore from manual backup completed',
-                successRestoreAuto: 'Restore from auto backup completed',
-                successAdminCreated: 'Administrator successfully created',
-                successAdminDeleted: 'Administrator deleted',
-                errorAuth: 'Authorization error',
-                errorLoadAdmins: 'Failed to load list',
-                errorLoadLogs: 'Failed to load logs',
-                errorRequest: 'Request execution error',
-                errorConnection: 'Connection error',
-                errorRequiredFields: 'Please fill in the required fields (Login and Password)'
+                contactPretext: 'for purchasing inquiries, please call:',
+                filtersTitle: 'Product Filters',
+                filterCodeLabel: 'Product Code', filterCodePlaceholder: 'Enter code',
+                filterNameLabel: 'Name', filterNamePlaceholder: 'Product name',
+                filterBrandLabel: 'Brand', filterBrandPlaceholder: 'Brand',
+                filterModelLabel: 'Model', filterModelPlaceholder: 'Model',
+                filterPriceMinLabel: 'Price from', filterPriceMinPlaceholder: 'min',
+                filterPriceMaxLabel: 'Price to', filterPriceMaxPlaceholder: 'max',
+                filterConditionLabel: 'Condition', filterConditionPlaceholder: 'Product condition',
+                applyBtn: 'Apply', resetBtn: 'Reset', mobileFilterBtn: 'Filters',
+                loading: 'Loading...', noItems: 'No products found', errorLoading: 'Error loading data',
+                connectionError: 'Failed to connect to server', detailsBtn: 'Details', priceEuro: '€',
+                prev: '‹ Previous', next: 'Next ›',
+                modalDescTitle: 'Product Description', defaultDescription: 'Detailed description for this product is missing.',
+                itemNotFound: 'Product not found or deleted.', connectionErrorModal: 'Failed to load details from server.',
+                loadingTitle: 'Loading...', loadingDesc: 'Please wait...', errorTitle: 'Error', connectionErrorTitle: 'Connection Error',
+                codeLabel: 'Code:', brandLabel: 'Brand:', modelLabel: 'Model:', conditionLabel: 'Condition:', autoLabel: 'Vehicle:'
             }
         };
         let currentLang = localStorage.getItem('appLang') || 'ru';
-        function t(key) { return translations[currentLang] && translations[currentLang][key] !== undefined ? translations[currentLang][key] : key; }
-        function updateStaticTexts() {
+        let currentPage = 1;
+        let currentFilters = {};
+        let totalPages = 1;
+        let sortState = { column: 'Code', order: 'asc' };
+        let lastMobileState = null;
+        const userConfig = localStorage.getItem('api_base_url');
+        const API_BASE = userConfig ? userConfig : window.location.origin;
+
+        function t(key) {
+            return translations[currentLang] && translations[currentLang][key] ? translations[currentLang][key] : key;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.toString().replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        async function openItemModal(recordId) {
+            document.getElementById('modalFullPhoto').src = API_BASE + '/photos/placeholder.png';
+            document.getElementById('modalItemTitle').textContent = t('loadingTitle');
+            document.getElementById('modalItemDescription').textContent = t('loadingDesc');
+            document.getElementById('modalItemSpecs').innerHTML = '';
+            document.getElementById('itemModalOverlay').classList.add('active');
+            document.getElementById('itemModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            try {
+                const dataResp = await fetch(API_BASE + `/item?record_id=${recordId}`);
+                if (dataResp.ok) {
+                    const item = await dataResp.json();
+                    document.getElementById('modalItemTitle').textContent = escapeHtml(item.NAME || t('loadingTitle'));
+                    document.getElementById('modalItemDescription').textContent = escapeHtml(item.Description || t('defaultDescription'));
+                    document.getElementById('modalItemSpecs').innerHTML = `<div style="margin-bottom: 5px;"><strong>${t('codeLabel')}</strong> ${escapeHtml(item.Code || '')}</div><div style="margin-bottom: 5px;"><strong>${t('brandLabel')}</strong> ${escapeHtml(item.Brand || '')}</div><div style="margin-bottom: 5px;"><strong>${t('modelLabel')}</strong> ${escapeHtml(item.Model || '')}</div><div style="margin-bottom: 5px;"><strong>${t('conditionLabel')}</strong> ${escapeHtml(item.Conditions || '')}</div><div style="margin-bottom: 5px;"><strong>${t('autoLabel')}</strong> ${escapeHtml(item.Truck_models || '')}</div>`;
+                    document.getElementById('modalContactsContainer').innerHTML = document.getElementById('headerContacts').innerHTML;
+                    if (item.photo_urls && item.photo_urls.length > 0) {
+                        document.getElementById('modalFullPhoto').src = API_BASE + `/item?record_id=${recordId}&size=0`;
+                    }
+                } else {
+                    document.getElementById('modalItemTitle').textContent = t('errorTitle');
+                    document.getElementById('modalItemDescription').textContent = t('itemNotFound');
+                }
+            } catch (e) {
+                document.getElementById('modalItemTitle').textContent = t('connectionErrorTitle');
+                document.getElementById('modalItemDescription').textContent = t('connectionErrorModal');
+            }
+        }
+
+        function closeItemModal() {
+            document.getElementById('itemModalOverlay').classList.remove('active');
+            document.getElementById('itemModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        async function loadData() {
+            const container = document.getElementById('tableContainer');
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile !== lastMobileState) lastMobileState = isMobile;
+            if (!isMobile) container.innerHTML = '<table id="dataTable"><tbody id="tableBody"></tbody></td>';
+            const loadingText = t('loading');
+            if (!isMobile) {
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="3" style="text-align: center;">${loadingText}</td></tr>`;
+            } else {
+                container.innerHTML = `<div class="mobile-product-list">${loadingText}</div>`;
+            }
+            const filters = JSON.parse(JSON.stringify(currentFilters));
+            filters.page = currentPage;
+            filters.page_size = 50;
+            for (let k in filters) if (filters[k] === null || filters[k] === '') delete filters[k];
+            try {
+                const resp = await fetch(API_BASE + '/data/filter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(filters)
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (!data.data || !data.data.length) {
+                        const noItemsMsg = t('noItems');
+                        if (!isMobile) {
+                            document.getElementById('tableBody').innerHTML = `<tr><td colspan="3" style="text-align: center;">${noItemsMsg}</td></tr>`;
+                        } else {
+                            container.innerHTML = `<div class="mobile-product-list">${noItemsMsg}</div>`;
+                        }
+                        totalPages = data.total_pages || 1;
+                        const div = document.getElementById('pagination');
+                        if (totalPages <= 1) {
+                            div.innerHTML = '';
+                        } else {
+                            let html = '';
+                            if (currentPage > 1) html += `<button onclick="currentPage = ${currentPage - 1}; loadData();">${t('prev')}</button>`;
+                            for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="currentPage = ${i}; loadData();">${i}</button>`;
+                            }
+                            if (currentPage < totalPages) html += `<button onclick="currentPage = ${currentPage + 1}; loadData();">${t('next')}</button>`;
+                            div.innerHTML = html;
+                        }
+                        return;
+                    }
+                    if (!isMobile) {
+                        let html = '';
+                        for (let i = 0; i < data.data.length; i++) {
+                            const row = data.data[i];
+                            let photoSrc = API_BASE + '/photos/placeholder.png';
+                            if (row.photo_urls && row.photo_urls.length > 0) {
+                                const url = row.photo_urls[0];
+                                if (url) {
+                                    const cleaned = url.toString().replace(/[<>'"]/g, '');
+                                    if (cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('/')) photoSrc = cleaned;
+                                }
+                            }
+                            html += `<tr><td class="col-photo"><img src="${photoSrc}" alt="" class="item-photo" loading="lazy"></td><td class="col-info"><div class="item-title">${escapeHtml(row.NAME || '')}</div><div class="item-specs"><strong>${t('codeLabel')}</strong> ${escapeHtml(row.Code || '')} <span class="bullet">•</span><strong>${t('brandLabel')}</strong> ${escapeHtml(row.Brand || '')} <span class="bullet">•</span><strong>${t('modelLabel')}</strong> ${escapeHtml(row.Model || '')} <span class="bullet">•</span><strong>${t('conditionLabel')}</strong> ${escapeHtml(row.Conditions || '')} <span class="bullet">•</span><strong>${t('autoLabel')}</strong> ${escapeHtml(row.Truck_models || '')}</div></td><td class="col-action"><div class="item-price">${escapeHtml(row.Price ? row.Price.toString() : '0')} ${t('priceEuro')}</div><button class="btn btn--black btn--small" onclick="openItemModal(${row.id})">${t('detailsBtn')}</button></td></tr>`;
+                        }
+                        document.getElementById('tableBody').innerHTML = html;
+                    } else {
+                        let cardsHtml = '<div class="mobile-product-list">';
+                        for (let i = 0; i < data.data.length; i++) {
+                            const row = data.data[i];
+                            let photoSrc = API_BASE + '/photos/placeholder.png';
+                            if (row.photo_urls && row.photo_urls.length > 0) {
+                                const url = row.photo_urls[0];
+                                if (url) {
+                                    const cleaned = url.toString().replace(/[<>'"]/g, '');
+                                    if (cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('/')) photoSrc = cleaned;
+                                }
+                            }
+                            cardsHtml += `<div class="mobile-product-card"><img src="${photoSrc}" alt="" class="item-photo" loading="lazy"><div class="item-title">${escapeHtml(row.NAME || '')}</div><div class="item-specs"><strong>${t('codeLabel')}</strong> ${escapeHtml(row.Code || '')} <span class="bullet">•</span><strong>${t('brandLabel')}</strong> ${escapeHtml(row.Brand || '')} <span class="bullet">•</span><strong>${t('modelLabel')}</strong> ${escapeHtml(row.Model || '')} <span class="bullet">•</span><strong>${t('conditionLabel')}</strong> ${escapeHtml(row.Conditions || '')} <span class="bullet">•</span><strong>${t('autoLabel')}</strong> ${escapeHtml(row.Truck_models || '')}</div><div class="item-price">${escapeHtml(row.Price ? row.Price.toString() : '0')} ${t('priceEuro')}</div><button class="btn btn--black btn--small" onclick="openItemModal(${row.id})">${t('detailsBtn')}</button></div>`;
+                        }
+                        cardsHtml += '</div>';
+                        container.innerHTML = cardsHtml;
+                    }
+                    totalPages = data.total_pages;
+                    const div = document.getElementById('pagination');
+                    if (totalPages <= 1) {
+                        div.innerHTML = '';
+                    } else {
+                        let html = '';
+                        if (currentPage > 1) html += `<button onclick="currentPage = ${currentPage - 1}; loadData();">${t('prev')}</button>`;
+                        for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                            html += `<button class="${i === currentPage ? 'active' : ''}" onclick="currentPage = ${i}; loadData();">${i}</button>`;
+                        }
+                        if (currentPage < totalPages) html += `<button onclick="currentPage = ${currentPage + 1}; loadData();">${t('next')}</button>`;
+                        div.innerHTML = html;
+                    }
+                } else {
+                    const errorMsg = t('errorLoading');
+                    if (!isMobile) {
+                        document.getElementById('tableBody').innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">${errorMsg}</td></tr>`;
+                    } else {
+                        container.innerHTML = `<div class="mobile-product-list" style="color: red;">${errorMsg}</div>`;
+                    }
+                }
+            } catch (e) {
+                const connError = t('connectionError');
+                if (!isMobile) {
+                    document.getElementById('tableBody').innerHTML = `<tr><td colspan="3" style="text-align: center; color: red;">${connError}</td></tr>`;
+                } else {
+                    container.innerHTML = `<div class="mobile-product-list" style="color: red;">${connError}</div>`;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const nameResponse = await fetch(API_BASE + '/site-name');
+                if (nameResponse.ok) {
+                    const nameData = await nameResponse.json();
+                }
+                const logoImg = document.getElementById('headerLogo');
+                logoImg.src = API_BASE + '/logo';
+                logoImg.onload = () => { logoImg.style.display = 'block'; };
+                logoImg.onerror = () => { logoImg.style.display = 'none'; };
+            } catch (e) { }
+            try {
+                const contactsResp = await fetch(API_BASE + '/contacts');
+                if (contactsResp.ok) {
+                    const contactsData = await contactsResp.json();
+                    if (contactsData.name) document.getElementById('contactName').textContent = contactsData.name;
+                    if (contactsData.phone) {
+                        const phoneEl = document.getElementById('contactPhone');
+                        phoneEl.textContent = contactsData.phone;
+                        phoneEl.href = 'tel:' + contactsData.phone.replace(/[^0-9+]/g, '');
+                    }
+                }
+            } catch (e) { }
+            ['filterCode', 'filterName', 'filterBrand', 'filterModel', 'filterPriceMin', 'filterPriceMax', 'filterCondition'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        let priceMinVal = document.getElementById('filterPriceMin').value;
+                        let priceMinNum = null;
+                        if (priceMinVal !== null && priceMinVal !== '') {
+                            const num = parseInt(priceMinVal);
+                            if (!isNaN(num)) priceMinNum = num;
+                        }
+                        let priceMaxVal = document.getElementById('filterPriceMax').value;
+                        let priceMaxNum = null;
+                        if (priceMaxVal !== null && priceMaxVal !== '') {
+                            const num = parseInt(priceMaxVal);
+                            if (!isNaN(num)) priceMaxNum = num;
+                        }
+                        currentFilters = { code: document.getElementById('filterCode').value || null, name: document.getElementById('filterName').value || null, brand: document.getElementById('filterBrand').value || null, model: document.getElementById('filterModel').value || null, price_min: priceMinNum, price_max: priceMaxNum, condition: document.getElementById('filterCondition').value || null, sort_by: sortState.column, sort_order: sortState.order };
+                        currentPage = 1;
+                        loadData();
+                        if (window.innerWidth <= 768) document.getElementById('filtersSidebar').classList.remove('show');
+                    }
+                });
+            });
+            document.getElementById('applyFiltersBtn').onclick = () => {
+                let priceMinVal = document.getElementById('filterPriceMin').value;
+                let priceMinNum = null;
+                if (priceMinVal !== null && priceMinVal !== '') {
+                    const num = parseInt(priceMinVal);
+                    if (!isNaN(num)) priceMinNum = num;
+                }
+                let priceMaxVal = document.getElementById('filterPriceMax').value;
+                let priceMaxNum = null;
+                if (priceMaxVal !== null && priceMaxVal !== '') {
+                    const num = parseInt(priceMaxVal);
+                    if (!isNaN(num)) priceMaxNum = num;
+                }
+                currentFilters = { code: document.getElementById('filterCode').value || null, name: document.getElementById('filterName').value || null, brand: document.getElementById('filterBrand').value || null, model: document.getElementById('filterModel').value || null, price_min: priceMinNum, price_max: priceMaxNum, condition: document.getElementById('filterCondition').value || null, sort_by: sortState.column, sort_order: sortState.order };
+                currentPage = 1;
+                loadData();
+                if (window.innerWidth <= 768) document.getElementById('filtersSidebar').classList.remove('show');
+            };
+            document.getElementById('resetFiltersBtn').onclick = () => {
+                ['filterCode', 'filterName', 'filterBrand', 'filterModel', 'filterPriceMin', 'filterPriceMax', 'filterCondition'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = '';
+                });
+                currentFilters = {};
+                currentPage = 1;
+                loadData();
+                if (window.innerWidth <= 768) document.getElementById('filtersSidebar').classList.remove('show');
+            };
+            try {
+                const response = await fetch(API_BASE + '/healthcheck');
+                if (response.ok) {
+                    const status = await response.json();
+                }
+            } catch (e) { }
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (key && translations[currentLang][key]) {
-                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') {
-                        if (el.placeholder !== undefined) el.placeholder = translations[currentLang][key];
-                        else el.textContent = translations[currentLang][key];
-                    } else if (el.tagName === 'OPTION') {
-                        el.textContent = translations[currentLang][key];
-                    } else {
-                        el.textContent = translations[currentLang][key];
-                    }
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[currentLang][key];
+                    else el.textContent = translations[currentLang][key];
                 }
             });
-            document.querySelectorAll('.lang-option').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === currentLang));
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (key && translations[currentLang][key]) el.placeholder = translations[currentLang][key];
+            });
+            document.documentElement.lang = currentLang === 'ru' ? 'ru' : 'en';
+            const switcher = document.getElementById('languageSwitcher');
             const toggleBtn = document.getElementById('langToggle');
-            if (toggleBtn) toggleBtn.textContent = currentLang.toUpperCase();
-        }
-        function setLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('appLang', lang);
-            updateStaticTexts();
-            loadAdmins();
-            loadLogs();
-        }
-        const switcher = document.getElementById('languageSwitcher');
-        const toggleBtn = document.getElementById('langToggle');
-        const menuOptions = document.querySelectorAll('.lang-option');
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            switcher.classList.toggle('open');
-        });
-        document.addEventListener('click', (e) => {
-            if (!switcher.contains(e.target)) switcher.classList.remove('open');
-        });
-        menuOptions.forEach(btn => {
-            btn.onclick = () => {
-                setLanguage(btn.dataset.lang);
-                switcher.classList.remove('open');
-            };
-        });
-        updateStaticTexts();
-
-        const API_BASE = window.location.origin;
-
-        (async function loadLogo() {
-            const logoImg = document.getElementById('headerLogo');
-            try {
-                const resp = await fetch(API_BASE + '/logo');
-                if (resp.ok) {
-                    const blob = await resp.blob();
-                    const url = URL.createObjectURL(blob);
-                    logoImg.src = url;
-                    logoImg.onload = () => {
-                        logoImg.style.display = 'block';
-                        URL.revokeObjectURL(url);
-                    };
-                    logoImg.onerror = () => {
-                        logoImg.style.display = 'none';
-                        URL.revokeObjectURL(url);
-                    };
-                } else {
-                    logoImg.style.display = 'none';
-                }
-            } catch (e) {
-                logoImg.style.display = 'none';
-            }
-        })();
-
-        document.querySelectorAll('.nav-tab').forEach(tab => {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(this.dataset.tab).classList.add('active');
+            const options = document.querySelectorAll('.lang-option');
+            toggleBtn.textContent = currentLang.toUpperCase();
+            options.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === currentLang);
             });
-        });
-
-        const token = localStorage.getItem('adminToken');
-        if (!token) { window.location.href = '/login'; }
-
-        (async function initialize() {
-            try {
-                const resp = await fetch(API_BASE + '/admin/verify-super', { headers: { 'Authorization': 'Bearer ' + token } });
-                if (!resp.ok) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
-                const data = await resp.json();
-                if (!data.valid) { localStorage.removeItem('adminToken'); window.location.href = '/login'; return; }
-                document.getElementById('mainWrapper').style.display = 'block';
-                loadAdmins();
-                loadLogs();
-                loadContacts();
-            } catch (e) { localStorage.removeItem('adminToken'); window.location.href = '/login'; }
-        })();
-
-        async function loadContacts() {
-            try {
-                const res = await fetch(API_BASE + '/contacts');
-                if (res.ok) {
-                    const data = await res.json();
-                    document.getElementById('contactPhone').value = data.phone || '';
-                    document.getElementById('contactName').value = data.name || '';
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки контактов:', error);
-            }
-        }
-
-        function confirmUpdateContacts() {
-            const phone = document.getElementById('contactPhone').value.trim();
-            const name = document.getElementById('contactName').value.trim();
-            showModal(t('confirmTitle'), t('updateContactsConfirm'), async () => {
-                const payload = { phone: phone, name: name };
-                try {
-                    const res = await fetch(API_BASE + '/admin/contacts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                        body: JSON.stringify(payload)
+            toggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                switcher.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!switcher.contains(e.target)) switcher.classList.remove('open');
+            });
+            options.forEach(btn => {
+                btn.onclick = () => {
+                    currentLang = btn.dataset.lang;
+                    localStorage.setItem('appLang', currentLang);
+                    toggleBtn.textContent = currentLang.toUpperCase();
+                    document.querySelectorAll('[data-i18n]').forEach(el => {
+                        const key = el.getAttribute('data-i18n');
+                        if (key && translations[currentLang][key]) {
+                            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = translations[currentLang][key];
+                            else el.textContent = translations[currentLang][key];
+                        }
                     });
-                    const data = await res.json();
-                    handleResponse(res, data, t('successContactsUpdated'));
-                } catch (e) { showAlert(t('errorRequest'), 'error'); }
-            });
-        }
-
-        async function loadAdmins() {
-            const tbody = document.getElementById('adminsTableBody');
-            try {
-                const res = await fetch(`${API_BASE}/admin/admins-list`, { headers: { 'Authorization': 'Bearer ' + token } });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.admins || data.admins.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
-                    } else {
-                        let html = '';
-                        data.admins.forEach(admin => {
-                            html += `<tr><td>${admin.username}</td><td>${admin.email}</td><td>******</td><td><button class="btn btn--danger btn--small" onclick="confirmDeleteAdmin('${admin.email}')">${t('actionCol')}</button></td></tr>`;
-                        });
-                        tbody.innerHTML = html;
-                    }
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
-                    showAlert(t('errorLoadAdmins'), 'error');
-                }
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center">${t('loading')}</td></tr>`;
-                showAlert(t('errorConnection'), 'error');
-            }
-        }
-
-        async function loadLogs() {
-            const tbody = document.getElementById('logsTableBody');
-            try {
-                const res = await fetch(`${API_BASE}/admin/logs`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (!data.logs || data.logs.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
-                    } else {
-                        let html = '';
-                        data.logs.forEach(log => {
-                            const reqData = log.request_data ? log.request_data.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-                            const resData = log.response_data ? log.response_data.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-                            const createdTime = log.created_at ? new Date(log.created_at).toLocaleString() : '';
-                            html += `<tr><td>${log.id}</td><td>${log.login || ''}</td><td>${log.endpoint || ''}</td><td class="log-data-cell" title="${reqData}">${reqData}</td><td class="log-data-cell" title="${resData}">${resData}</td><td>${createdTime}</td></tr>`;
-                        });
-                        tbody.innerHTML = html;
-                    }
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
-                    showAlert(t('errorLoadLogs'), 'error');
-                }
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center">${t('loading')}</td></tr>`;
-                showAlert(t('errorConnection'), 'error');
-            }
-        }
-
-        function showAddAdminModal() {
-            document.getElementById('regUsername').value = '';
-            document.getElementById('regEmail').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regPassword').type = 'password';
-            toggleGenerateButton();
-            document.getElementById('addAdminModal').classList.add('active');
-        }
-
-        const regUsername = document.getElementById('regUsername');
-        const regPassword = document.getElementById('regPassword');
-        const generatePwdBtn = document.getElementById('generatePwdBtn');
-
-        function toggleGenerateButton() {
-            if (regUsername.value.trim().length > 0 && regPassword.value.length === 0) {
-                generatePwdBtn.style.display = 'inline-flex';
-            } else {
-                generatePwdBtn.style.display = 'none';
-            }
-        }
-
-        regUsername.addEventListener('input', toggleGenerateButton);
-        regPassword.addEventListener('input', toggleGenerateButton);
-        generatePwdBtn.addEventListener('click', () => {
-            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$%&?!`~_-<>";
-            const passwordLength = 12;
-            let generatedPassword = "";
-            for (let i = 0; i < passwordLength; i++) {
-                const randomIndex = Math.floor(Math.random() * chars.length);
-                generatedPassword += chars[randomIndex];
-            }
-            regPassword.value = generatedPassword;
-            regPassword.type = 'text';
-            toggleGenerateButton();
-            showAlert(t('generateBtn'), 'info');
-        });
-
-        async function registerAdmin() {
-            const username = regUsername.value.trim();
-            const password = regPassword.value;
-            let email = regEmail.value.trim();
-            if (!username || !password) {
-                return showAlert(t('errorRequiredFields'), 'error');
-            }
-            if (!email) {
-                email = `${username}@system.local`;
-            }
-            const payload = { username: username, email: email, password: password };
-            try {
-                const res = await fetch(API_BASE + '/admin/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    showAlert(t('successAdminCreated'), 'success');
-                    document.getElementById('addAdminModal').classList.remove('active');
-                    loadAdmins();
-                } else {
-                    showAlert(data.detail || t('errorRequest'), 'error');
-                }
-            } catch (e) {
-                showAlert(t('errorConnection'), 'error');
-            }
-        }
-
-        function createManualBackup() {
-            showModal(t('confirmTitle'), t('createBackupConfirm'), async () => {
-                try {
-                    const res = await fetch(API_BASE + '/admin/backup/create', { method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
-                    const data = await res.json();
-                    handleResponse(res, data, t('successBackupCreated'));
-                } catch (e) { showAlert(t('errorRequest'), 'error'); }
-            });
-        }
-
-        async function restoreManualBackup() {
-            const targetTables = document.getElementById('restoreManualTables').value;
-            showModal(t('confirmTitle'), t('restoreManualConfirm'), async () => {
-                const formData = new FormData();
-                formData.append('target_tables', targetTables);
-                try {
-                    const res = await fetch(API_BASE + '/admin/backup/restore', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token },
-                        body: formData
+                    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                        const key = el.getAttribute('data-i18n-placeholder');
+                        if (key && translations[currentLang][key]) el.placeholder = translations[currentLang][key];
                     });
-                    const data = await res.json();
-                    handleResponse(res, data, t('successRestoreManual'));
-                } catch (e) { showAlert(t('errorRequest'), 'error'); }
-            });
-        }
-
-        async function restoreAutoBackup() {
-            const targetTables = document.getElementById('restoreAutoTables').value;
-            showModal(t('confirmTitle'), t('restoreAutoConfirm'), async () => {
-                const formData = new FormData();
-                formData.append('target_tables', targetTables);
-                try {
-                    const res = await fetch(API_BASE + '/admin/backup/restore-auto', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token },
-                        body: formData
+                    document.documentElement.lang = currentLang === 'ru' ? 'ru' : 'en';
+                    options.forEach(innerBtn => {
+                        innerBtn.classList.toggle('active', innerBtn.dataset.lang === currentLang);
                     });
-                    const data = await res.json();
-                    handleResponse(res, data, t('successRestoreAuto'));
-                } catch (e) { showAlert(t('errorRequest'), 'error'); }
+                    switcher.classList.remove('open');
+                    loadData();
+                };
             });
-        }
-
-        function confirmDeleteAdmin(targetEmail) {
-            showModal(t('confirmTitle'), `${t('deleteAdminConfirm')} ${targetEmail}?`, async () => {
-                const formData = new FormData();
-                formData.append('email', targetEmail);
-                try {
-                    const res = await fetch(API_BASE + '/admin/delete', {
-                        method: 'POST',
-                        headers: { 'Authorization': 'Bearer ' + token },
-                        body: formData
-                    });
-                    if (res.ok) {
-                        showAlert(t('successAdminDeleted'), 'success');
-                        loadAdmins();
-                    } else {
-                        const data = await res.json();
-                        handleResponse(res, data, '');
-                    }
-                } catch (e) { showAlert(t('errorRequest'), 'error'); }
+            loadData();
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeItemModal();
             });
-        }
-
-        function handleResponse(res, data, successMsg) {
-            if (res.ok) {
-                showAlert(successMsg || data.message || t('confirmBtn'), 'success');
-            } else {
-                showAlert(data.detail || t('errorRequest'), 'error');
-            }
-        }
-
-        function showAlert(msg, type) {
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-' + type;
-            alert.textContent = msg;
-            document.body.appendChild(alert);
-            setTimeout(() => alert.remove(), 4000);
-        }
-
-        let confirmActionCallback = null;
-        const modal = document.getElementById('confirmModal');
-
-        function showModal(title, message, callback) {
-            document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalMessage').textContent = message;
-            confirmActionCallback = callback;
-            modal.classList.add('active');
-        }
-
-        document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-            if (confirmActionCallback) confirmActionCallback();
-            document.getElementById('confirmModal').classList.remove('active');
-            confirmActionCallback = null;
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) document.getElementById('filtersSidebar').classList.remove('show');
+                const wasMobile = lastMobileState;
+                const nowMobile = window.innerWidth <= 768;
+                if (wasMobile !== nowMobile) {
+                    lastMobileState = nowMobile;
+                    loadData();
+                }
+            });
         });
     </script>
 </body>
